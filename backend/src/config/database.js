@@ -9,7 +9,8 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error('Database connection error:', error);
-    process.exit(1);
+    console.log('Server will continue running without database connection');
+    // 不再直接退出进程，而是继续运行
   }
 };
 
