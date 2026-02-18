@@ -1,0 +1,21 @@
+<resources>
+    <!-- 通用 padding / margin -->
+    <dimen name="layout_padding_large">16dp</dimen>
+    <dimen name="layout_padding_medium">12dp</dimen>
+    <dimen name="layout_margin_medium">12dp</dimen>
+
+    <!-- 头像尺寸 -->
+    <dimen name="avatar_size">64dp</dimen>
+
+    <!-- 列表 item 高度 -->
+    <dimen name="list_item_height">56dp</dimen>
+
+    <!-- 图标尺寸 -->
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_small">16dp</dimen>
+
+    <!-- 文本尺寸 -->
+    <dimen name="text_size_large">18sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+</resources>

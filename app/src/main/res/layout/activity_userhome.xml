@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".activity.utils.UserHomeActivity">
+
+    <!-- ============================================= -->
+    <!--          顶部蓝色用户信息区域                   -->
+    <!-- ============================================= -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/app_primary_blue"
+        android:padding="@dimen/layout_padding_large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 用户头像 (圆形) -->
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:background="@drawable/shape_circle_white"
+            android:contentDescription="用户头像"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <!-- 用户名 -->
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/layout_margin_medium"
+            android:text="用户名"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_large"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_welcome_message"
+            app:layout_constraintStart_toEndOf="@id/iv_avatar"
+            app:layout_constraintTop_toTopOf="@id/iv_avatar"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <!-- 欢迎语 -->
+        <TextView
+            android:id="@+id/tv_welcome_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="欢迎来到信息App"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_small"
+            app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+            app:layout_constraintStart_toStartOf="@id/tv_username"
+            app:layout_constraintTop_toBottomOf="@id/tv_username" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- ============================================= -->
+    <!--                功能列表容器                     -->
+    <!-- ============================================= -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:divider="@drawable/shape_divider"
+        android:showDividers="middle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_layout">
+
+        <!-- Item 1: 个人信息 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_personal_info"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/layout_padding_medium"
+            android:paddingEnd="@dimen/layout_padding_medium">
+
+            <ImageView
+                android:id="@+id/icon_personal_info"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/icon_tint_gray"
+                tools:srcCompat="@drawable/user" /> <!-- 占位符图标, 请替换 -->
+
+            <TextView
+                android:id="@+id/text_personal_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_medium"
+                android:text="个人信息"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_personal_info" />
+
+            <ImageView
+                android:id="@+id/arrow_personal_info"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:src="@drawable/right_arrow"
+                app:tint="@color/icon_tint_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Item 2: 我的收藏 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_favorites"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/layout_padding_medium"
+            android:paddingEnd="@dimen/layout_padding_medium">
+
+            <ImageView
+                android:id="@+id/icon_favorites"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/icon_tint_gray"
+                tools:srcCompat="@drawable/favorite" /> <!-- 占位符图标, 请替换 -->
+
+            <TextView
+                android:id="@+id/text_favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_medium"
+                android:text="我的收藏"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_favorites" />
+
+            <ImageView
+                android:id="@+id/arrow_favorites"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:src="@drawable/right_arrow"
+                app:tint="@color/icon_tint_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Item 3: 浏览历史 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_history"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/layout_padding_medium"
+            android:paddingEnd="@dimen/layout_padding_medium">
+
+            <ImageView
+                android:id="@+id/icon_history"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/icon_tint_gray"
+                tools:srcCompat="@drawable/history" /> <!-- 占位符图标, 请替换 -->
+
+            <TextView
+                android:id="@+id/text_history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_medium"
+                android:text="浏览历史"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_history" />
+
+            <ImageView
+                android:id="@+id/arrow_history"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:src="@drawable/right_arrow"
+                app:tint="@color/icon_tint_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Item 4: 设置 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_settings"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/layout_padding_medium"
+            android:paddingEnd="@dimen/layout_padding_medium">
+
+            <ImageView
+                android:id="@+id/icon_settings"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/icon_tint_gray"
+                tools:srcCompat="@drawable/settings" /> <!-- 占位符图标, 请替换 -->
+
+            <TextView
+                android:id="@+id/text_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_medium"
+                android:text="设置"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_settings" />
+
+            <ImageView
+                android:id="@+id/arrow_settings"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:src="@drawable/right_arrow"
+                app:tint="@color/icon_tint_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Item 5: 关于我们 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_about"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/layout_padding_medium"
+            android:paddingEnd="@dimen/layout_padding_medium">
+
+            <ImageView
+                android:id="@+id/icon_about"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/icon_tint_gray"
+                tools:srcCompat="@drawable/about_us" /> <!-- 占位符图标, 请替换 -->
+
+            <TextView
+                android:id="@+id/text_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_medium"
+                android:text="关于我们"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_about" />
+
+            <ImageView
+                android:id="@+id/arrow_about"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:src="@drawable/right_arrow"
+                app:tint="@color/icon_tint_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Item 6: 意见反馈 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="@dimen/layout_padding_medium"
+            android:paddingEnd="@dimen/layout_padding_medium">
+
+            <ImageView
+                android:id="@+id/icon_feedback"
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/icon_tint_gray"
+                tools:srcCompat="@drawable/feedback" /> <!-- 占位符图标, 请替换 -->
+
+            <TextView
+                android:id="@+id/text_feedback"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_medium"
+                android:text="意见反馈"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_feedback" />
+
+            <ImageView
+                android:id="@+id/arrow_feedback"
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:src="@drawable/right_arrow"
+                app:tint="@color/icon_tint_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
