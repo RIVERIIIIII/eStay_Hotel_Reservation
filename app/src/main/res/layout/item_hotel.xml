@@ -32,65 +32,76 @@
         </androidx.cardview.widget.CardView>
 
         <!-- Right: Info -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
             android:paddingStart="12dp">
 
             <!-- Name -->
             <TextView
                 android:id="@+id/tv_hotel_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/tv_rating"
                 android:text="Hotel Name"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/primary_brown"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
+
+            <!-- Rating -->
+            <TextView
+                android:id="@+id/tv_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignBaseline="@id/tv_hotel_name"
+                android:text="4.8"
+                android:textColor="@color/white"
+                android:background="@drawable/bg_rating_capsule"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp" />
 
             <!-- Distance -->
             <TextView
                 android:id="@+id/tv_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/tv_hotel_name"
                 android:layout_marginTop="4dp"
                 android:text="距市中心 2.5 km"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
-            <!-- Tags (using HorizontalScrollView for simplicity if many tags, or just a few chips) -->
-            <!-- Using a FlowLayout or ChipGroup is better, but ChipGroup inside list item can be heavy. -->
-            <!-- I'll use a LinearLayout for a few tags. -->
+            <!-- Tags -->
             <LinearLayout
                 android:id="@+id/ll_tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/tv_distance"
                 android:orientation="horizontal"
                 android:layout_marginTop="8dp">
                 <!-- Tags will be added dynamically -->
             </LinearLayout>
             
-            <!-- Spacer to push price to bottom -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <!-- Price -->
             <TextView
                 android:id="@+id/tv_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:gravity="end"
                 android:text="¥ 300 起"
                 android:textColor="@color/app_primary_brown"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 

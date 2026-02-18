@@ -46,6 +46,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
     private String conversationPartnerName;
     private String currentUsername;
     private String token;
+    private String hotelName; // New field
 
     private ImageView ivAvatar;
     private TextView tvUserStatus;
@@ -66,6 +67,8 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
         setContentView(R.layout.activity_message_chat);
 
         conversationPartnerName = getIntent().getStringExtra("sender_name");
+        hotelName = getIntent().getStringExtra("hotel_name"); // Get hotel name
+
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         currentUsername = prefs.getString("account", "");
 
@@ -183,6 +186,15 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
 
     private void setupHeader() {
         if (tvUserName == null) return;
+        
+        // If hotel name is provided, use it directly
+        if (!TextUtils.isEmpty(hotelName)) {
+            tvUserName.setText("正在咨询：" + hotelName);
+            // Optionally set a default avatar for hotel
+            Glide.with(ChatActivity.this).load(R.drawable.splash_image).circleCrop().into(ivAvatar); // Placeholder
+            return;
+        }
+
         new Thread(() -> {
             final Message conversation = dbHelper.loadSingleConversation(conversationPartnerName);
             final User partnerUser = dbHelper.searchUserByAccount(conversationPartnerName);

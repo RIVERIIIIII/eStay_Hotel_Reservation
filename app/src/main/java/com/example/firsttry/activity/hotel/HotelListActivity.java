@@ -483,7 +483,8 @@ public class HotelListActivity extends AppCompatActivity {
                     300 + (i * 50),
                     tags,
                     1.5 + (i * 0.5),
-                    searchQuery.isLocationMode() // Use isLocationMode flag from query
+                    searchQuery.isLocationMode(), // Use isLocationMode flag from query
+                    4.0f + (i % 10) * 0.1f // Mock average rating (4.0 - 4.9)
             ));
         }
         return list;

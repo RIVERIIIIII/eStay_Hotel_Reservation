@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.user.LoginActivity"/>
+        <activity android:name=".MainActivity" />
         <activity android:name=".activity.user.RegisterActivity"/>
         <activity android:name=".activity.utils.VideoActivity"/>
         <activity android:name=".activity.reset_password.ResetPasswordActivity" />

@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                             try {
                                 // 防御性跳转：检查目标类是否存在
-                                Class<?> targetClass = Class.forName("com.example.firsttry.activity.hotel.HotelSearchActivity");
+                                Class<?> targetClass = Class.forName("com.example.firsttry.MainActivity");
                                 Intent intent = new Intent(LoginActivity.this, targetClass);
                                 startActivity(intent);
                                 finish();
@@ -124,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         if (btnSkipLogin != null) {
             btnSkipLogin.setOnClickListener(v -> {
                 try {
-                    Class<?> targetClass = Class.forName("com.example.firsttry.activity.hotel.HotelSearchActivity");
+                    Class<?> targetClass = Class.forName("com.example.firsttry.MainActivity");
                     Intent intent = new Intent(LoginActivity.this, targetClass);
                     startActivity(intent);
                     // 跳过登录通常不finish，方便返回测试，正式上线可去掉

@@ -38,4 +38,9 @@
     <color name="background_content">#FFFFFF</color>
     <color name="app_primary_blue">#8C6A5E</color> <!-- Replaced with brown for consistency -->
     <color name="icon_tint_gray">#9E9E9E</color>
+
+    <!-- Rating System Colors -->
+    <color name="rating_bg_beige">#F5F5DC</color>
+    <color name="rating_star_filled">@color/primary_brown</color>
+    <color name="rating_star_empty">#E0E0E0</color>
 </resources>

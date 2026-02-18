@@ -21,6 +21,10 @@ import com.example.firsttry.activity.hotel.dialog.CalendarDialogFragment;
 import com.example.firsttry.activity.hotel.model.RoomType;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import android.view.LayoutInflater;
+import android.widget.RatingBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,8 +105,15 @@ public class HotelDetailActivity extends AppCompatActivity {
         
         // Message Button Logic
         findViewById(R.id.btn_message).setOnClickListener(v -> {
-            // Navigate to Message List
-            android.content.Intent intent = new android.content.Intent(this, com.example.firsttry.activity.message.MessageActivity.class);
+            TextView tvHotelName = findViewById(R.id.tv_hotel_name_cn);
+            String hotelName = tvHotelName != null ? tvHotelName.getText().toString() : "酒店咨询";
+            String hotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
+            if (hotelId == null) hotelId = "hotel_service"; // Fallback
+
+            // Navigate to Chat Activity
+            android.content.Intent intent = new android.content.Intent(this, com.example.firsttry.activity.message.chat.ChatActivity.class);
+            intent.putExtra("sender_name", hotelId); // Treat hotel ID as the chat partner
+            intent.putExtra("hotel_name", hotelName);
             startActivity(intent);
         });
 
@@ -112,6 +123,52 @@ public class HotelDetailActivity extends AppCompatActivity {
         // Setup CollapsingToolbar title behavior
         CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitleEnabled(false); // We use custom title in layout
+
+        // Rating Button Logic
+        findViewById(R.id.btn_rating).setOnClickListener(v -> showRatingDialog());
+        
+        // Mock average rating (In real app, fetch from API)
+        updateAverageRating(4.5f);
+    }
+
+    private void updateAverageRating(float rating) {
+        TextView tvAvgRating = findViewById(R.id.tv_avg_rating);
+        if (tvAvgRating != null) {
+            tvAvgRating.setText(String.valueOf(rating));
+        }
+    }
+
+    private void showRatingDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_hotel_rating, null);
+        dialog.setContentView(view);
+
+        RatingBar ratingBar = view.findViewById(R.id.rating_bar);
+        TextView tvScore = view.findViewById(R.id.tv_rating_value);
+        TextView btnCancel = view.findViewById(R.id.btn_cancel);
+        TextView btnSubmit = view.findViewById(R.id.btn_submit);
+
+        // Initial state
+        ratingBar.setRating(0);
+        tvScore.setText("0.0 分");
+
+        ratingBar.setOnRatingBarChangeListener((ratingBar1, rating, fromUser) -> {
+            tvScore.setText(rating + " 分");
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSubmit.setOnClickListener(v -> {
+            float rating = ratingBar.getRating();
+            // Simulate backend submission
+            Toast.makeText(this, "评分成功: " + rating + "分", Toast.LENGTH_SHORT).show();
+            // In real app, re-fetch hotel details to get updated average rating
+            // For now, just simulate a slight change
+            updateAverageRating(4.6f); 
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private void setupBanner() {

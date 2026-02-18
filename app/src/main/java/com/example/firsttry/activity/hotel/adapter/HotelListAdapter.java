@@ -57,6 +57,7 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
         TextView tvName;
         TextView tvDistance;
         TextView tvPrice;
+        TextView tvRating;
         LinearLayout llTags;
 
         public HotelViewHolder(@NonNull View itemView) {
@@ -65,11 +66,20 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
             tvName = itemView.findViewById(R.id.tv_hotel_name);
             tvDistance = itemView.findViewById(R.id.tv_distance);
             tvPrice = itemView.findViewById(R.id.tv_price);
+            tvRating = itemView.findViewById(R.id.tv_rating);
             llTags = itemView.findViewById(R.id.ll_tags);
         }
 
         public void bind(HotelModel hotel) {
             tvName.setText(hotel.getName());
+            
+            // Rating
+            if (hotel.getAverageRating() > 0) {
+                tvRating.setVisibility(View.VISIBLE);
+                tvRating.setText(String.valueOf(hotel.getAverageRating()));
+            } else {
+                tvRating.setVisibility(View.GONE);
+            }
             
             // Distance logic
             String distanceText;
