@@ -1,0 +1,112 @@
+# MongoDB 安装修复指南
+
+## 问题分析
+根据检查结果，您的 MongoDB 安装目录结构不完整：
+- 只有 `data` 和 `log` 目录，缺少关键的 `bin` 目录
+- 没有 `mongod.exe` 和 `mongo.exe` 可执行文件
+- 这不是标准的 MongoDB 完整安装
+
+## 解决方案
+
+### 步骤 1: 下载并安装完整的 MongoDB
+
+1. 访问 MongoDB 官方下载页面：https://www.mongodb.com/try/download/community
+2. 选择 "Windows" 平台，下载 MongoDB Community Server 4.4 版本（与您现有数据兼容）
+3. 运行安装程序
+4. 选择 "Complete" 安装类型
+5. 在 "Service Configuration" 页面：
+   - 选择 "Install MongoDB as a Service"
+   - 选择 "Run the service as Network Service user"
+   - 设置数据目录为 `D:\MyDoc\MongoDB\Server\4.4\data`
+   - 设置日志目录为 `D:\MyDoc\MongoDB\Server\4.4\log`
+6. 完成安装
+
+### 步骤 2: 验证 MongoDB 安装
+
+安装完成后，打开命令提示符（管理员权限）：
+
+```cmd
+# 检查 MongoDB 服务状态
+net start MongoDB
+
+# 连接到 MongoDB
+mongo
+```
+
+如果看到 MongoDB shell 提示符，说明安装成功。
+
+### 步骤 3: 启动 MongoDB 服务
+
+如果 MongoDB 服务未自动启动：
+
+1. 按 Win + R，输入 `services.msc`
+2. 找到 "MongoDB Server" 服务
+3. 右键点击，选择 "Start"
+4. 确认服务状态为 "Running"
+
+### 步骤 4: 测试后端连接
+
+启动后端服务：
+
+```cmd
+cd d:\MyDoc\Hotel-Assistant\backend
+npm run dev
+```
+
+如果看到 "MongoDB Connected: localhost" 消息，表示数据库连接成功。
+
+### 步骤 5: 初始化项目数据库（可选）
+
+如果需要重置数据库或添加示例数据：
+
+```cmd
+npm run init-db
+```
+
+这会执行数据库初始化脚本，创建默认管理员账号和商家账号。
+
+## 常见问题排查
+
+### MongoDB 服务启动失败
+
+1. **端口被占用**：
+   - 检查 27017 端口是否被其他程序占用
+   - 使用 `netstat -ano | findstr :27017` 查看占用程序
+   - 关闭占用程序或修改 MongoDB 端口
+
+2. **权限问题**：
+   - 确保 MongoDB 服务有足够的权限访问数据目录和日志目录
+   - 数据目录和日志目录的权限设置应该允许 Network Service 用户访问
+
+3. **配置文件错误**：
+   - 检查配置文件 `C:\Program Files\MongoDB\Server\4.4\bin\mongod.cfg`
+   - 确保数据目录和日志目录路径正确
+
+### 数据库连接失败
+
+1. **服务未启动**：
+   - 确保 MongoDB 服务正在运行
+   - 检查服务状态：`net start MongoDB`
+
+2. **连接字符串错误**：
+   - 检查 `backend/.env` 文件中的 `MONGODB_URI`
+   - 默认应该是：`mongodb://localhost:27017/hotel-booking`
+
+3. **防火墙设置**：
+   - 确保防火墙允许 27017 端口的入站连接
+   - 添加防火墙规则：`netsh advfirewall firewall add rule name="MongoDB" dir=in action=allow protocol=TCP localport=27017`
+
+## 数据迁移说明
+
+由于您已经有现有的数据目录 `D:\MyDoc\MongoDB\Server\4.4\data`，在重新安装 MongoDB 时：
+
+1. 安装程序会自动使用现有数据目录
+2. 现有数据会被保留
+3. 如果需要，可以在安装前备份 `data` 目录
+
+## 联系支持
+
+如果问题仍然存在，请：
+1. 查看 MongoDB 日志文件：`D:\MyDoc\MongoDB\Server\4.4\log\mongod.log`
+2. 搜索日志中的错误信息
+3. 或提供完整的日志文件内容以便进一步分析

@@ -32,12 +32,21 @@ const Layout = () => {
                 易宿酒店平台
               </Link>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <Link to="/hotels" style={{ textDecoration: 'none', color: '#333' }}>
-                  我的酒店
-                </Link>
-                <Link to="/hotels/add" style={{ textDecoration: 'none', color: '#333' }}>
-                  添加酒店
-                </Link>
+                {/* 根据用户角色显示不同的导航选项 */}
+                {isAdmin ? (
+                  <Link to="/admin" style={{ textDecoration: 'none', color: '#333' }}>
+                    酒店审核
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/hotels" style={{ textDecoration: 'none', color: '#333' }}>
+                      我的酒店
+                    </Link>
+                    <Link to="/hotels/add" style={{ textDecoration: 'none', color: '#333' }}>
+                      添加酒店
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
             <div className="flex" style={{ gap: '1rem', alignItems: 'center' }}>

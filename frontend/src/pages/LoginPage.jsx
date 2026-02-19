@@ -40,7 +40,12 @@ const LoginPage = () => {
     const result = await login(formData);
     
     if (result.success) {
-      navigate('/');
+      // 根据用户角色跳转到不同页面
+      if (result.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } else {
       setError(result.error);
     }

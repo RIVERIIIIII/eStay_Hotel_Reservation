@@ -56,6 +56,8 @@ export const adminAPI = {
   getAllHotels: (params) => api.get('/admin/hotels', { params }),
   approveHotel: (id) => api.put(`/admin/hotels/${id}/approve`),
   rejectHotel: (id, reason) => api.put(`/admin/hotels/${id}/reject`, { reason }),
+  publishHotel: (id) => api.put(`/admin/hotels/${id}/publish`),
+  unpublishHotel: (id) => api.put(`/admin/hotels/${id}/unpublish`),
 };
 
 export default api;

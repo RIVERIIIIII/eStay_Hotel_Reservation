@@ -1,0 +1,146 @@
+# MongoDB 连接问题排查指南
+
+## 问题总结
+- MongoDB服务存在但无法启动
+- 无法找到mongod.exe可执行文件
+- 连接到localhost:27017时出现ECONNREFUSED错误
+
+## 详细排查步骤
+
+### 1. 检查MongoDB服务状态
+
+```powershell
+# 查看MongoDB服务状态
+Get-Service | Where-Object {$_.Name -like '*Mongo*'}
+```
+
+**结果**: MongoDB服务存在，但状态为Stopped
+
+### 2. 尝试启动MongoDB服务
+
+```powershell
+# 尝试启动MongoDB服务
+Start-Service -Name MongoDB
+```
+
+**结果**: 启动失败，错误信息："无法打开计算机上的MongoDB服务"
+
+### 3. 检查MongoDB可执行文件
+
+```powershell
+# 查找mongod.exe文件
+where.exe mongod
+```
+
+**结果**: 未找到mongod.exe文件
+
+### 4. 检查MongoDB安装目录
+
+```powershell
+# 查看MongoDB安装目录结构
+Get-ChildItem -Path 'D:\MyDoc\MongoDB' -Recurse
+```
+
+**结果**: 只有data和log目录，缺少关键的bin目录和可执行文件
+
+### 5. 查看MongoDB日志
+
+**最近日志**: 2026-02-13的日志显示MongoDB正常运行，但没有2026-02-14的启动失败日志
+
+## 根因分析
+
+**主要问题**: MongoDB安装不完整，只包含数据文件和日志文件，但缺少核心的可执行文件（如mongod.exe、mongo.exe等）。
+
+**可能原因**:
+1. MongoDB安装过程中断
+2. 手动删除了bin目录
+3. 安装时选择了自定义安装但未选择完整组件
+4. 系统环境变量中未添加MongoDB的bin目录
+
+## 解决方案
+
+### 方案1: 重新安装MongoDB（推荐）
+
+1. **卸载现有MongoDB**:
+   - 控制面板 -> 程序和功能 -> 卸载MongoDB
+   - 手动删除 `D:\MyDoc\MongoDB` 目录
+
+2. **下载并安装完整的MongoDB**:
+   - 访问 https://www.mongodb.com/try/download/community
+   - 选择Windows版本，下载MongoDB Community Server 4.4
+   - 运行安装程序，选择"Complete"安装类型
+   - 在"Service Configuration"页面:
+     - 勾选"Install MongoDB as a Service"
+     - 设置数据目录为 `D:\MyDoc\MongoDB\Server\4.4\data`
+     - 设置日志目录为 `D:\MyDoc\MongoDB\Server\4.4\log`
+
+3. **验证安装**:
+   ```powershell
+   # 检查mongod.exe是否存在
+   where.exe mongod
+   
+   # 检查MongoDB服务状态
+   Get-Service | Where-Object {$_.Name -like '*Mongo*'}
+   ```
+
+4. **启动MongoDB服务**:
+   ```powershell
+   Start-Service -Name MongoDB
+   ```
+
+### 方案2: 修复现有MongoDB安装
+
+如果不想重新安装，可以尝试修复:
+
+1. **重新运行MongoDB安装程序**:
+   - 找到MongoDB安装文件，运行它
+   - 选择"Repair"选项进行修复
+
+2. **检查修复结果**:
+   ```powershell
+   # 检查mongod.exe是否存在
+   where.exe mongod
+   ```
+
+### 方案3: 直接运行mongod
+
+如果修复后仍无法启动服务，可以尝试直接运行mongod:
+
+```powershell
+# 直接运行mongod（使用管理员权限）
+mongod --dbpath "D:\MyDoc\MongoDB\Server\4.4\data" --logpath "D:\MyDoc\MongoDB\Server\4.4\log\mongod.log" --service
+```
+
+## 验证连接
+
+安装或修复完成后，验证连接:
+
+```powershell
+# 连接到MongoDB
+mongo
+
+# 检查当前数据库
+db
+```
+
+## 后端连接测试
+
+```powershell
+# 启动后端服务
+cd d:\MyDoc\Hotel-Assistant\backend
+npm run dev
+```
+
+如果看到"MongoDB Connected: localhost"消息，表示数据库连接成功。
+
+## 注意事项
+
+1. **安装路径**: 确保MongoDB安装在系统可以访问的路径，避免中文路径
+2. **权限问题**: 确保MongoDB服务有足够的权限访问数据目录和日志目录
+3. **端口冲突**: 检查27017端口是否被其他程序占用
+4. **防火墙设置**: 确保防火墙允许27017端口的入站连接
+
+如果问题仍然存在，请提供以下信息以便进一步分析:
+1. MongoDB安装日志
+2. 完整的系统事件日志
+3. 尝试直接运行mongod时的详细输出

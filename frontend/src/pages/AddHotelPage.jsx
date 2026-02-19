@@ -16,8 +16,13 @@ const AddHotelPage = () => {
     openingTime: '',
     description: '',
     amenities: [],
-    roomTypes: [{ type: '', price: '' }]
+    roomTypes: [{ type: '', price: '' }],
+    images: [],
+    mainImage: ''
   });
+  
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -44,8 +49,16 @@ const AddHotelPage = () => {
         openingTime: hotel.openingTime ? hotel.openingTime.split('T')[0] : '',
         description: hotel.description || '',
         amenities: hotel.amenities || [],
-        roomTypes: hotel.roomTypes?.length > 0 ? hotel.roomTypes : [{ type: '', price: '' }]
+        roomTypes: hotel.roomTypes?.length > 0 ? hotel.roomTypes : [{ type: '', price: '' }],
+        images: hotel.images || [],
+        mainImage: hotel.mainImage || ''
       });
+      
+      setUploadedImages(hotel.images || []);
+      if (hotel.images && hotel.images.length > 0) {
+        const mainIndex = hotel.images.indexOf(hotel.mainImage || hotel.images[0]);
+        setMainImageIndex(mainIndex >= 0 ? mainIndex : 0);
+      }
     } catch (error) {
       setError('获取酒店信息失败');
       console.error('Error fetching hotel:', error);
@@ -106,6 +119,81 @@ const AddHotelPage = () => {
     }
 
     return null;
+  };
+
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      files.forEach(file => {
+        formData.append('images', file);
+      });
+
+      // 这里需要先上传图片，获取图片URL
+      const response = await fetch('http://localhost:5000/api/hotels/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('图片上传失败');
+      }
+
+      const data = await response.json();
+      const newImages = data.images || [];
+      
+      setUploadedImages(prev => [...prev, ...newImages]);
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...newImages],
+        mainImage: prev.mainImage || newImages[0] || ''
+      }));
+      
+      if (newImages.length > 0) {
+        setMainImageIndex(uploadedImages.length);
+      }
+    } catch (error) {
+      setError('图片上传失败: ' + error.message);
+      console.error('Error uploading images:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeImage = (index) => {
+    const newImages = [...uploadedImages];
+    newImages.splice(index, 1);
+    
+    setUploadedImages(newImages);
+    setFormData(prev => {
+      const updatedImages = [...prev.images];
+      updatedImages.splice(index, 1);
+      return {
+        ...prev,
+        images: updatedImages,
+        mainImage: newImages[Math.min(mainImageIndex, newImages.length - 1)] || ''
+      };
+    });
+    
+    if (mainImageIndex === index) {
+      setMainImageIndex(0);
+    } else if (mainImageIndex > index) {
+      setMainImageIndex(mainImageIndex - 1);
+    }
+  };
+
+  const setMainImage = (index) => {
+    setMainImageIndex(index);
+    setFormData(prev => ({
+      ...prev,
+      mainImage: uploadedImages[index] || ''
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -367,6 +455,96 @@ const AddHotelPage = () => {
                       ×
                     </button>
                   </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="card mb-3">
+          <h3 className="mb-2">酒店图片</h3>
+          
+          <div className="form-group mb-3">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              disabled={loading}
+              style={{ display: 'block', marginBottom: '0.5rem' }}
+            />
+            <small className="text-muted">支持多张图片上传</small>
+          </div>
+
+          {uploadedImages.length > 0 && (
+            <div>
+              <h4 className="mb-2">已上传图片 ({uploadedImages.length})</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+                {uploadedImages.map((image, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      position: 'relative',
+                      border: mainImageIndex === index ? '2px solid #007bff' : '1px solid #ddd',
+                      borderRadius: '4px',
+                      padding: '5px',
+                      maxWidth: '150px'
+                    }}
+                  >
+                    <img
+                      src={image}
+                      alt={`酒店图片 ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: '100px',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '5px',
+                        right: '5px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '3px'
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setMainImage(index)}
+                        style={{
+                          background: mainImageIndex === index ? '#007bff' : '#fff',
+                          color: mainImageIndex === index ? '#fff' : '#007bff',
+                          border: '1px solid #007bff',
+                          borderRadius: '2px',
+                          padding: '2px 4px',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer'
+                        }}
+                        disabled={loading}
+                      >
+                        {mainImageIndex === index ? '主图' : '设为主图'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        style={{
+                          background: '#dc3545',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '2px',
+                          padding: '2px 4px',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer'
+                        }}
+                        disabled={loading}
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

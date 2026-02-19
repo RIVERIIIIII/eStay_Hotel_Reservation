@@ -39,15 +39,23 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
+      console.log('开始登录， credentials:', credentials);
       const response = await authAPI.login(credentials);
+      console.log('登录响应:', response);
       const { token, user } = response.data;
+      
+      console.log('获取到token:', token);
+      console.log('获取到user:', user);
       
       localStorage.setItem('authToken', token);
       localStorage.setItem('userInfo', JSON.stringify(user));
       setUser(user);
       
-      return { success: true };
+      console.log('登录成功，已设置用户状态');
+      return { success: true, user };
     } catch (error) {
+      console.log('登录失败， error:', error);
+      console.log('error.response:', error.response);
       return { 
         success: false, 
         error: error.response?.data?.message || '登录失败' 
@@ -57,15 +65,33 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
+      console.log('开始注册， userData:', userData);
       const response = await authAPI.register(userData);
+      console.log('注册响应:', response);
       const { token, user } = response.data;
+      
+      console.log('获取到token:', token);
+      console.log('获取到user:', user);
       
       localStorage.setItem('authToken', token);
       localStorage.setItem('userInfo', JSON.stringify(user));
       setUser(user);
       
+      console.log('注册成功，已设置用户状态');
       return { success: true };
     } catch (error) {
+      console.log('注册失败， error:', error);
+      console.log('error.response:', error.response);
+      
+      // 处理验证错误
+      if (error.response?.data?.errors) {
+        const errorMessages = error.response.data.errors.map(err => err.msg).join('; ');
+        return { 
+          success: false, 
+          error: errorMessages 
+        };
+      }
+      
       return { 
         success: false, 
         error: error.response?.data?.message || '注册失败' 
