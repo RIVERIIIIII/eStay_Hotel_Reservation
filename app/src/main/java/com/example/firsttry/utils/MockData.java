@@ -63,8 +63,15 @@ public class MockData {
         return "mock_token_123456";
     }
 
-    public static String getMockUser() {
-        return "MockUser";
+    // 模拟忘记密码流程的数据
+    public static class ResetPasswordFlow {
+        public static final String EMAIL = "test@example.com";
+        public static final String VERIFICATION_CODE = "8888";
+        public static final String NEW_PASSWORD = "NewPassword123!";
+    }
+
+    public static ResetPasswordFlow getMockResetPasswordData() {
+        return new ResetPasswordFlow();
     }
 
     // 需要引入 Message 类，注意包名
@@ -84,5 +91,9 @@ public class MockData {
         messages.add(m3);
         
         return messages;
+    }
+
+    public static String getMockUser() {
+        return "MockUser";
     }
 }

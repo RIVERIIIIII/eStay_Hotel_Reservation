@@ -3,21 +3,27 @@ package com.example.firsttry.activity.reset_password;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View; // 导入 View
-import android.widget.Button; // 导入 Button
+import android.view.KeyEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.firsttry.R;
+import com.example.firsttry.remote.Http.UserApi;
+
+import java.io.IOException;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
-    private String verificationCode; // 从上个页面接收的正确验证码
+    private String userEmail; // 用户邮箱
     private String userEnteredOtp;   // 用户实际输入的验证码
 
     private EditText[] otpEditTexts;
-    private Button btnConfirm; // 声明确认按钮
+    private Button btnConfirm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +31,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_check_code);
 
         initView();
-        getVerificationCode();
-        setupConfirmButtonListener(); // 设置按钮监听
+        getIntentData();
+        setupConfirmButtonListener();
+        setupOtpInputListeners();
     }
 
     private void initView() {
@@ -39,22 +46,16 @@ public class ResetPasswordActivity extends AppCompatActivity {
         btnConfirm = findViewById(R.id.btn_confirm);
     }
 
-    // 从Intent获取正确的验证码
-    private void getVerificationCode() {
+    private void getIntentData() {
         Intent intent = getIntent();
-        String receivedCode = intent.getStringExtra("VERIFICATION_CODE");
-
-        if (receivedCode != null && !receivedCode.isEmpty()) {
-            this.verificationCode = receivedCode;
-            Log.d("ResetPasswordActivity", "成功接收到的验证码是: " + this.verificationCode);
-        } else {
-            Log.e("ResetPasswordActivity", "没有在Intent中找到有效的验证码!");
-            Toast.makeText(this, "获取验证码失败，请返回重试", Toast.LENGTH_SHORT).show();
-            finish();
+        userEmail = intent.getStringExtra("email");
+        if (userEmail == null || userEmail.isEmpty()) {
+            // 防御性处理，如果没有 email 也许应该退出
+            Log.e("ResetPasswordActivity", "Email is missing!");
         }
+        // 不再需要获取本地的 VERIFICATION_CODE
     }
 
-    // 从输入框收集用户输入的验证码
     private void collectOtpInput() {
         StringBuilder otpBuilder = new StringBuilder();
         for (EditText editText : otpEditTexts) {
@@ -63,28 +64,79 @@ public class ResetPasswordActivity extends AppCompatActivity {
         userEnteredOtp = otpBuilder.toString();
     }
 
-    // 设置确认按钮的点击监听
     private void setupConfirmButtonListener() {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 只有当用户点击按钮时，才收集并检查验证码
                 collectOtpInput();
-                Log.d("ResetPasswordActivity", "用户点击确认，输入的验证码是: " + userEnteredOtp);
-
-                // 进行比较
-                if (verificationCode.equals(userEnteredOtp)) {
-                    Toast.makeText(ResetPasswordActivity.this, "验证码正确", Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(ResetPasswordActivity.this, SetNewPasswordActivity.class);
-                    // 把 email 继续传递给下一个页面
-                    intent.putExtra("email", getIntent().getStringExtra("email"));
-                    startActivity(intent);
-                    finish(); // 验证成功后，关闭当前页面
-                } else {
-                    Toast.makeText(ResetPasswordActivity.this, "验证码错误，请重新输入", Toast.LENGTH_SHORT).show();
+                if (userEnteredOtp.length() != 4) {
+                    Toast.makeText(ResetPasswordActivity.this, "请输入完整验证码", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                
+                // 调用服务器校验验证码
+                UserApi.verifyOtp(userEmail, userEnteredOtp, new UserApi.UserCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(ResetPasswordActivity.this, "验证成功", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(ResetPasswordActivity.this, SetNewPasswordActivity.class);
+                            intent.putExtra("email", userEmail);
+                            intent.putExtra("otp", userEnteredOtp); // 传递 OTP 给下一步
+                            startActivity(intent);
+                            finish();
+                        });
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        runOnUiThread(() -> Toast.makeText(ResetPasswordActivity.this, "验证失败: " + message, Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onFailure(IOException e) {
+                        runOnUiThread(() -> Toast.makeText(ResetPasswordActivity.this, "网络错误", Toast.LENGTH_SHORT).show());
+                    }
+                });
             }
         });
+    }
+
+    private void setupOtpInputListeners() {
+        for (int i = 0; i < otpEditTexts.length; i++) {
+            final int index = i;
+            otpEditTexts[i].addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() == 1) {
+                        if (index < otpEditTexts.length - 1) {
+                            otpEditTexts[index + 1].requestFocus();
+                        } else {
+                            // 最后一个输入框，隐藏键盘或自动提交
+                            // InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            // imm.hideSoftInputFromWindow(otpEditTexts[index].getWindowToken(), 0);
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+            
+            // 处理删除键回退
+            otpEditTexts[i].setOnKeyListener((v, keyCode, event) -> {
+                if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN) {
+                    if (otpEditTexts[index].getText().length() == 0 && index > 0) {
+                        otpEditTexts[index - 1].requestFocus();
+                        otpEditTexts[index - 1].setSelection(otpEditTexts[index - 1].getText().length());
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
     }
 }

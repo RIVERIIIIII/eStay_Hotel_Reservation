@@ -18,11 +18,15 @@ import java.io.IOException;
 public class ForgetPasswordActivity extends AppCompatActivity {
 
     private Button btnNext;
+    private Button btnPreviewReset;
+    private Button btnPreviewOtp;
     private EditText reset_email;
 
     private void initView() {
         reset_email= findViewById(R.id.et_email);
         btnNext= findViewById(R.id.btn_reset_account);
+        btnPreviewReset = findViewById(R.id.btn_preview_reset);
+        btnPreviewOtp = findViewById(R.id.btn_preview_otp);
         forgetPasswordListener();
     }
 
@@ -40,6 +44,23 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 RestRequest(reset_email);
             }
         });
+
+        if (btnPreviewReset != null) {
+            btnPreviewReset.setOnClickListener(v -> {
+                Intent intent = new Intent(ForgetPasswordActivity.this, SetNewPasswordActivity.class);
+                intent.putExtra("email", "preview@example.com");
+                startActivity(intent);
+            });
+        }
+
+        if (btnPreviewOtp != null) {
+            btnPreviewOtp.setOnClickListener(v -> {
+                Intent intent = new Intent(ForgetPasswordActivity.this, ResetPasswordActivity.class);
+                intent.putExtra("VERIFICATION_CODE", "1234"); // 模拟验证码
+                intent.putExtra("email", "preview@example.com");
+                startActivity(intent);
+            });
+        }
     }
 
     private void RestRequest(EditText email){

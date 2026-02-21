@@ -25,15 +25,18 @@ public class SetNewPasswordActivity extends AppCompatActivity {
     // private UserDbHelper dbHelper; // 不再需要这个，因为本地不操作密码
 
     private String userEmail;
+    private String otp; // 新增 OTP 字段
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password); // 请确保你的布局文件名正确
 
-        // 获取从上个页面传来的 email
+        // 获取从上个页面传来的 email 和 otp
         Intent intent = getIntent();
         userEmail = intent.getStringExtra("email");
+        otp = intent.getStringExtra("otp");
+
         if (userEmail == null || userEmail.isEmpty()) {
             Toast.makeText(this, "无法获取用户信息，请重试", Toast.LENGTH_LONG).show();
             finish(); // 结束Activity
@@ -65,12 +68,12 @@ public class SetNewPasswordActivity extends AppCompatActivity {
             }
 
             // 发送网络请求到服务器来重置密码
-            ResetRequest(userEmail, newPassword, confirmedNewPassword);
+            ResetRequest(userEmail, newPassword, confirmedNewPassword, otp);
         });
     }
 
-    private void ResetRequest(String email, String newPassword, String confirmedNewPassword){
-        UserApi.reset_password(email, newPassword, confirmedNewPassword, new UserApi.UserCallback() {
+    private void ResetRequest(String email, String newPassword, String confirmedNewPassword, String otp){
+        UserApi.reset_password(email, newPassword, confirmedNewPassword, otp, new UserApi.UserCallback() {
             @Override
             public void onSuccess(String message) {
                 runOnUiThread(() -> {
