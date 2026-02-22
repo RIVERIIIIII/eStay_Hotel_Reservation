@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 1. 根布局必须是 RelativeLayout 或 FrameLayout，而不是 LinearLayout -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 2. 先写背景图片，让它铺满整个屏幕，作为最底下的图层 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/splash_image"
+        android:scaleType="centerCrop" />
+
+    <!-- 3. 后写文字，它会显示在图片的上一层 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test App"
+        android:textColor="@android:color/white"
+        android:textSize="38sp"
+        android:shadowColor="#000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textStyle="italic"
+        android:layout_marginBottom="48dp" />
+
+</RelativeLayout>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.FirstTry">
+
+        <activity
+            android:name=".activity.utils.SplashActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.FirstTry">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.user.LoginActivity"/>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".activity.user.RegisterActivity"/>
+        <activity android:name=".activity.utils.VideoActivity"/>
+        <activity android:name=".activity.reset_password.ResetPasswordActivity" />
+        <activity android:name=".activity.reset_password.ForgetPasswordActivity" />
+        <activity android:name=".activity.reset_password.SetNewPasswordActivity" />
+        <activity android:name=".activity.message.MessageActivity" />
+        <activity android:name=".activity.message.chat.ChatActivity"/>
+        <activity android:name=".activity.message.chat.remark.EditRemarkActivity" />
+        <activity
+            android:name=".activity.hotel.HotelSearchActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activity.hotel.CityPickerActivity" />
+        <activity android:name=".activity.hotel.HotelListActivity" />
+        <activity
+            android:name=".activity.hotel.HotelDetailActivity"
+            android:theme="@style/Theme.FirstTry" />
+    </application>
+
+</manifest>
