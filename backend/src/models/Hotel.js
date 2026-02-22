@@ -72,6 +72,17 @@ const hotelSchema = new mongoose.Schema({
   rejectReason: {
     type: String,
     trim: true
+  },
+  averageRating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: null
+  },
+  ratingCount: {
+    type: Number,
+    min: 0,
+    default: 0
   }
 }, {
   timestamps: true

@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   getMobileHotels, 
   getMobileHotelById,
+  getFeaturedHotels,
   createBooking,
   getUserBookings 
 } from '../controllers/mobileController.js';
@@ -10,6 +11,9 @@ import { authenticateToken } from '../middleware/auth.js';
 const router = express.Router();
 
 // 移动端酒店查询接口（不需要认证）
+
+// 获取推荐酒店（用于首页Banner）
+router.get('/hotels/featured', getFeaturedHotels);
 
 // 获取酒店列表（支持筛选）
 router.get('/hotels', getMobileHotels);

@@ -10,6 +10,13 @@ const userSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 30
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
+  },
   password: {
     type: String,
     required: true,
@@ -17,13 +24,15 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['merchant', 'admin'],
-    default: 'merchant'
+    enum: ['merchant', 'admin', 'user'],
+    default: 'user'
   },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 });
 
 // 密码加密中间件

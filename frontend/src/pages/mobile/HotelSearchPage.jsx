@@ -42,16 +42,12 @@ const HotelSearchPage = () => {
   const loadBanners = async () => {
     setLoadingBanners(true);
     try {
-      // 调用API获取所有酒店，然后随机选择3个作为推荐
-      const response = await hotelAPI.getAll({ page: 1, limit: 10 });
-      const { hotels: allHotels } = response.data;
-      
-      // 随机排序并选择前3个
-      const shuffled = [...allHotels].sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, 3);
+      // 调用API获取推荐酒店
+      const response = await hotelAPI.getFeatured();
+      const { hotels: featuredHotels } = response.data;
       
       // 转换为Banner格式
-      const bannerData = selected.map((hotel, index) => ({
+      const bannerData = featuredHotels.map((hotel, index) => ({
         id: hotel._id,
         title: hotel.name,
         subtitle: `¥${hotel.price}起/晚`,

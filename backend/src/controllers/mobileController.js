@@ -3,25 +3,39 @@ import Booking from '../models/Booking.js';
 
 export const getMobileHotels = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      city, 
-      minPrice, 
-      maxPrice, 
-      starRating, 
-      amenities 
+    const {
+      page = 1,
+      limit = 10,
+      city,
+      keyword,
+      minPrice,
+      maxPrice,
+      starRating,
+      amenities,
+      checkInDate,
+      checkOutDate,
+      sorter
     } = req.query;
     const skip = (page - 1) * limit;
-    
+
     // 构建查询条件，只查询已审核通过的酒店
     let query = { status: 'approved' };
-    
+
     // 按城市筛选
     if (city) {
-      query.city = city;
+      query.address = { $regex: city, $options: 'i' };
     }
-    
+
+    // 按关键字搜索（酒店名称、描述、地址）
+    if (keyword) {
+      query.$or = [
+        { name: { $regex: keyword, $options: 'i' } },
+        { name_en: { $regex: keyword, $options: 'i' } },
+        { description: { $regex: keyword, $options: 'i' } },
+        { address: { $regex: keyword, $options: 'i' } }
+      ];
+    }
+
     // 按价格范围筛选
     if (minPrice || maxPrice) {
       query.price = {};
@@ -32,22 +46,42 @@ export const getMobileHotels = async (req, res) => {
         query.price.$lte = parseFloat(maxPrice);
       }
     }
-    
+
     // 按星级筛选
     if (starRating) {
       query.starRating = parseInt(starRating);
     }
-    
+
     // 按设施筛选
     if (amenities) {
-      const amenitiesArray = Array.isArray(amenities) ? amenities : amenities.split(',');
+      const amenitiesArray = Array.isArray(amenities) ? amenities : amenities.split(',');  
       query.amenities = { $all: amenitiesArray };
+    }
+
+    // 构建排序对象
+    let sortOptions = { createdAt: -1 }; // 默认按创建时间降序
+    
+    if (sorter) {
+        // 支持格式: "price_asc" 或 "price_desc"
+        const [field, direction] = sorter.split('_');
+        if (field === 'price') {
+            sortOptions = { price: direction === 'asc' ? 1 : -1 };
+        } else if (field === 'rating') {
+            // 按用户平均评分降序排序，没有评分的排在后面
+            sortOptions = { averageRating: -1, createdAt: -1 };
+        }
+    }
+    
+    // 检查是否需要按推荐排序
+    if (!sorter) {
+        // 推荐排序：按用户平均评分降序，没有评分的按星级降序，然后按创建时间降序
+        sortOptions = { averageRating: -1, starRating: -1, createdAt: -1 };
     }
 
     // 执行查询
     const hotels = await Hotel.find(query)
       .select('-createdBy -status -rejectReason')
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
       .skip(skip)
       .limit(parseInt(limit));
 
@@ -62,6 +96,27 @@ export const getMobileHotels = async (req, res) => {
         pages: Math.ceil(total / limit)
       }
     });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// 获取推荐酒店（用于首页Banner）
+export const getFeaturedHotels = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 3;
+    
+    // 查询所有已审核通过的酒店
+    const hotels = await Hotel.find({ status: 'approved' })
+      .select('-createdBy -status -rejectReason')
+      .sort({ createdAt: -1 });
+    
+    // 随机排序
+    const shuffled = hotels.sort(() => 0.5 - Math.random());
+    // 选择前N个
+    const featured = shuffled.slice(0, limit);
+    
+    res.json({ hotels: featured });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
