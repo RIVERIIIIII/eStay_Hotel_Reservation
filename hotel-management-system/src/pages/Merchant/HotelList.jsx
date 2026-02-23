@@ -88,7 +88,6 @@ const HotelList = () => {
                 <tr>
                   <th>名称</th>
                   <th>地址</th>
-                  <th>位置（经纬度）</th>
                   <th>星级</th>
                   <th>价格</th>
                   <th>状态</th>
@@ -100,12 +99,6 @@ const HotelList = () => {
                   <tr key={hotel._id}>
                     <td>{hotel.name}</td>
                     <td>{hotel.address}</td>
-                    <td>
-                      {hotel.latitude && hotel.longitude 
-                        ? `${hotel.latitude}, ${hotel.longitude}`
-                        : '未设置'
-                      }
-                    </td>
                     <td>{hotel.star_rating || hotel.starRating} 星</td>
                     <td>¥{getPriceRange(hotel)}/晚</td>
                     <td>

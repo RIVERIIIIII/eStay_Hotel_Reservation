@@ -1,6 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import hotelService from '../../services/hotelService';
+
+// 自定义地图点击事件组件
+const MapClickHandler = ({ onMapClick }) => {
+  const mapEvents = useMapEvents({
+    click: (e) => {
+      const { lat, lng } = e.latlng;
+      console.log('地图点击位置:', lng, lat);
+      onMapClick({ lat, lng });
+    }
+  });
+  return null;
+};
 
 const HotelForm = () => {
   // 内联样式
@@ -50,6 +65,7 @@ const HotelForm = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -57,6 +73,18 @@ const HotelForm = () => {
       fetchHotelDetails();
     }
   }, [id]);
+
+  // 处理地图点击事件
+  const handleMapClick = ({ lat, lng }) => {
+    // 使用setTimeout避免在事件处理中直接修改状态导致的问题
+    setTimeout(() => {
+      setFormData(prev => ({
+        ...prev,
+        latitude: lat.toFixed(6),
+        longitude: lng.toFixed(6)
+      }));
+    }, 0);
+  };
 
   const fetchHotelDetails = async () => {
     try {
@@ -264,7 +292,12 @@ const HotelForm = () => {
       } else {
         await hotelService.createHotel(submitData);
       }
-      navigate('/merchant/hotels');
+      // 先隐藏地图，避免跳转时的DOM清理问题
+      setShowMap(false);
+      // 延迟跳转，确保地图完全卸载
+      setTimeout(() => {
+        navigate('/merchant/hotels');
+      }, 100);
     } catch (err) {
       console.error('Save hotel error:', err.response?.data);
       if (err.response?.data?.errors) {
@@ -317,36 +350,78 @@ const HotelForm = () => {
               required
             />
           </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="latitude">纬度<span style={{ color: 'red' }}>*</span></label>
-              <input
-                type="number"
-                id="latitude"
-                name="latitude"
-                value={formData.latitude}
-                onChange={handleChange}
-                required
-                step="0.000001"
-                min="-90"
-                max="90"
-                placeholder="请输入纬度（-90到90之间）"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="longitude">经度<span style={{ color: 'red' }}>*</span></label>
-              <input
-                type="number"
-                id="longitude"
-                name="longitude"
-                value={formData.longitude}
-                onChange={handleChange}
-                required
-                step="0.000001"
-                min="-180"
-                max="180"
-                placeholder="请输入经度（-180到180之间）"
-              />
+          <div className="form-group">
+            <label>位置<span style={{ color: 'red' }}>*</span></label>
+            <div style={{ marginBottom: '10px' }}>
+              <p style={{ marginBottom: '10px', fontSize: '14px', color: '#666' }}>
+                请在地图上点击选择酒店位置
+              </p>
+              {!showMap ? (
+                <button
+                  type="button"
+                  onClick={() => setShowMap(true)}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#2196f3',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  📍 打开地图选点
+                </button>
+              ) : (
+                <>
+                  {/* Leaflet 地图容器 */}
+                  <div 
+                    style={{ 
+                      width: '100%', 
+                      height: '400px', 
+                      border: '1px solid #ddd', 
+                      borderRadius: '4px',
+                      zIndex: 1
+                    }}
+                  >
+                    <MapContainer 
+                      center={[parseFloat(formData.latitude) || 39.915, parseFloat(formData.longitude) || 116.404]} 
+                      zoom={13} 
+                      style={{ height: '100%', width: '100%' }}
+                    >
+                      <TileLayer
+                        url="https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+                        subdomains={['1', '2', '3', '4']}
+                        attribution='&copy; <a href="https://www.amap.com">高德地图</a>'
+                      />
+                      {formData.latitude && formData.longitude && (
+                        <Marker 
+                          position={[parseFloat(formData.latitude), parseFloat(formData.longitude)]}
+                        >
+                          <Popup>
+                            选择的酒店位置<br />
+                            纬度: {formData.latitude}<br />
+                            经度: {formData.longitude}
+                          </Popup>
+                        </Marker>
+                      )}
+                      <MapClickHandler onMapClick={handleMapClick} />
+                    </MapContainer>
+                  </div>
+                  {formData.latitude && formData.longitude && (
+                    <p style={{ 
+                      marginTop: '10px', 
+                      fontSize: '14px', 
+                      color: '#4CAF50',
+                      textAlign: 'center'
+                    }}>
+                      已选择位置：纬度 {formData.latitude}，经度 {formData.longitude}
+                    </p>
+                  )}
+                </>
+              )}
             </div>
           </div>
           <div className="form-row">
