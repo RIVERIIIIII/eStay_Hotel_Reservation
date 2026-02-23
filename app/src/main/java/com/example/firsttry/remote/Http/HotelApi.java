@@ -5,12 +5,20 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.example.firsttry.activity.hotel.model.HotelModel;
+<<<<<<< Updated upstream
+=======
+import com.example.firsttry.activity.hotel.model.HotelSearchQuery;
+>>>>>>> Stashed changes
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+<<<<<<< Updated upstream
+=======
+import org.json.JSONArray;
+>>>>>>> Stashed changes
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,6 +121,7 @@ public class HotelApi {
     }
 
     // 获取酒店列表
+<<<<<<< Updated upstream
     public static void getHotelList(String city, String keyword, String checkInDate, String checkOutDate, int page, int limit, String sortBy, Integer minPrice, Integer maxPrice, Integer starRating, List<String> amenities, HotelListCallback callback) {
         // 构建查询参数
         StringBuilder urlBuilder = new StringBuilder(HttpClient.BASE_URL + "api/public/hotels?");
@@ -171,6 +180,69 @@ public class HotelApi {
 
         Request request = new Request.Builder()
                 .url(url)
+=======
+    public static void getHotelList(HotelSearchQuery query, HotelListCallback callback) {
+        String url = HttpClient.BASE_URL + "api/public/hotels";
+        
+        JSONObject jsonBody = new JSONObject();
+        try {
+            if (query.getCity() != null) jsonBody.put("city", query.getCity());
+            jsonBody.put("locationMode", query.isLocationMode());
+            if (query.isLocationMode()) {
+                jsonBody.put("latitude", query.getLatitude());
+                jsonBody.put("longitude", query.getLongitude());
+            }
+            if (query.getKeyword() != null) jsonBody.put("keyword", query.getKeyword());
+            if (query.getCheckInDate() != null) jsonBody.put("checkInDate", query.getCheckInDate());
+            if (query.getCheckOutDate() != null) jsonBody.put("checkOutDate", query.getCheckOutDate());
+            
+            jsonBody.put("roomCount", query.getRoomCount());
+            jsonBody.put("adultCount", query.getAdultCount());
+            jsonBody.put("childCount", query.getChildCount());
+            
+            if (query.getMinPrice() > 0) jsonBody.put("minPrice", query.getMinPrice());
+            if (query.getMaxPrice() > 0) jsonBody.put("maxPrice", query.getMaxPrice());
+            if (query.getStarRating() > 0) jsonBody.put("starRating", query.getStarRating());
+            
+            if (query.getQuickTags() != null && !query.getQuickTags().isEmpty()) {
+                JSONArray tags = new JSONArray();
+                for (String t : query.getQuickTags()) tags.put(t);
+                jsonBody.put("quickTags", tags);
+            }
+            
+            if (query.getSortBy() != null) jsonBody.put("sortBy", query.getSortBy());
+            
+            if (query.getFacilities() != null && !query.getFacilities().isEmpty()) {
+                JSONArray facilities = new JSONArray();
+                for (String f : query.getFacilities()) facilities.put(f);
+                jsonBody.put("facilities", facilities);
+            }
+            
+            if (query.getUserLocation() != null) {
+                JSONObject loc = new JSONObject();
+                loc.put("latitude", query.getUserLocation().latitude);
+                loc.put("longitude", query.getUserLocation().longitude);
+                jsonBody.put("userLocation", loc);
+            }
+            
+            jsonBody.put("page", query.getPage());
+            jsonBody.put("pageSize", query.getPageSize());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            if (callback != null) {
+                callback.onError("Constructing request failed");
+            }
+            return;
+        }
+
+        RequestBody body = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
+        Log.d(TAG, "POST: " + url);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+>>>>>>> Stashed changes
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
