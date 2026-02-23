@@ -10,21 +10,27 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.firsttry.R;
-import com.example.firsttry.activity.hotel.model.RoomType;
+import com.example.firsttry.activity.hotel.model.HotelModel;
 
 import java.util.List;
 
 import android.widget.Toast;
 
+import com.example.firsttry.activity.hotel.BookingConfirmationActivity;
+import com.example.firsttry.activity.hotel.HotelDetailActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.app.Activity;
+
 public class RoomTypeAdapter extends RecyclerView.Adapter<RoomTypeAdapter.RoomTypeViewHolder> {
 
-    private List<RoomType> roomTypes;
+    private List<HotelModel.RoomType> roomTypes;
 
-    public RoomTypeAdapter(List<RoomType> roomTypes) {
+    public RoomTypeAdapter(List<HotelModel.RoomType> roomTypes) {
         this.roomTypes = roomTypes;
     }
 
-    public void updateData(List<RoomType> newRoomTypes) {
+    public void updateData(List<HotelModel.RoomType> newRoomTypes) {
         this.roomTypes = newRoomTypes;
         notifyDataSetChanged();
     }
@@ -38,14 +44,51 @@ public class RoomTypeAdapter extends RecyclerView.Adapter<RoomTypeAdapter.RoomTy
 
     @Override
     public void onBindViewHolder(@NonNull RoomTypeViewHolder holder, int position) {
-        RoomType room = roomTypes.get(position);
-        holder.tvName.setText(room.getName());
-        holder.tvBedInfo.setText(room.getBedType());
-        holder.tvArea.setText(room.getArea());
+        HotelModel.RoomType room = roomTypes.get(position);
+        holder.tvName.setText(room.getType());
+        holder.tvBedInfo.setText(room.getDescription()); 
+        holder.tvArea.setText(""); 
         holder.tvPrice.setText("¥" + room.getPrice());
         
         holder.btnBook.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "预定成功", Toast.LENGTH_SHORT).show();
+            Context context = v.getContext();
+            Intent intent = new Intent(context, BookingConfirmationActivity.class);
+            
+            // Try to get data from HotelDetailActivity context if possible, or pass mock/default data
+            if (context instanceof HotelDetailActivity) {
+                HotelDetailActivity activity = (HotelDetailActivity) context;
+                // Note: You might need to expose getters in HotelDetailActivity for these fields
+                // For now, let's assume we can get them or pass defaults. 
+                // Since fields are private, we need to add public getters in HotelDetailActivity
+                // OR put these extras in the intent directly if we had access.
+                
+                // Let's modify HotelDetailActivity to expose current check-in/out dates or hotel name.
+                // For this step, I'll pass room info. Hotel info might be missing if not passed.
+                
+                // HACK: Since we are inside Adapter, we don't have easy access to Activity's private fields.
+                // Ideally, we should use a callback interface.
+                // For simplicity as requested, let's try to get hotel name from a TextView if possible, or pass "当前酒店"
+                
+                TextView tvHotelName = ((Activity)context).findViewById(R.id.tv_hotel_name_cn);
+                String hotelName = tvHotelName != null ? tvHotelName.getText().toString() : "当前酒店";
+                
+                // Get dates from activity intent or static/public fields?
+                // Let's assume default dates for now or try to parse from UI (not robust).
+                // Better approach: Pass hotelName and dates to Adapter constructor or updateData.
+                
+                intent.putExtra(BookingConfirmationActivity.EXTRA_HOTEL_NAME, hotelName);
+                intent.putExtra(BookingConfirmationActivity.EXTRA_ROOM_TYPE, room.getType());
+                intent.putExtra(BookingConfirmationActivity.EXTRA_ROOM_DESC, room.getDescription());
+                intent.putExtra(BookingConfirmationActivity.EXTRA_PRICE, room.getPrice());
+                
+                // We need date info. Let's try to get it from the Activity if we add getters.
+                // I will add getters to HotelDetailActivity in next step.
+                 intent.putExtra(BookingConfirmationActivity.EXTRA_CHECK_IN, ((HotelDetailActivity) context).getCheckInDate());
+                 intent.putExtra(BookingConfirmationActivity.EXTRA_CHECK_OUT, ((HotelDetailActivity) context).getCheckOutDate());
+                 intent.putExtra(BookingConfirmationActivity.EXTRA_TOTAL_NIGHTS, ((HotelDetailActivity) context).getTotalNights());
+            }
+            
+            context.startActivity(intent);
         });
     }
 

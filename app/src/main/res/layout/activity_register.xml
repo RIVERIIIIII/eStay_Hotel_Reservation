@@ -60,31 +60,6 @@
             android:paddingStart="38dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/PhotoInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/UserInputLayout"
-        app:startIconDrawable="@drawable/photo"
-        app:startIconTint="@android:color/black">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_photo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="请输入头像链接"
-            android:inputType="textEmailAddress"
-            android:paddingStart="38dp"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-
     <!-- 邮箱输入框 -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/emailInputLayout"
@@ -97,8 +72,8 @@
         app:boxCornerRadiusTopEnd="8dp"
         app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/UserInputLayout"
-        app:layout_constraintTop_toBottomOf="@id/PhotoInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/UserInputLayout"
         app:startIconDrawable="@drawable/email"
         app:startIconTint="@android:color/black">
 

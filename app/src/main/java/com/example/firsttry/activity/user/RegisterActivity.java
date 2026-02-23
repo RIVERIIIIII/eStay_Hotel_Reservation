@@ -20,7 +20,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText etAccount;
     private EditText etPassword;
-    private EditText etPhoto;
     private EditText etEmail;
     private EditText confirmPassword;
     private Button btnRegister;
@@ -40,7 +39,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void initView() {
         etAccount = findViewById(R.id.et_account);
-        etPhoto = findViewById(R.id.et_photo);
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
         confirmPassword = findViewById(R.id.confirmed_password);
@@ -53,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
             String inputEmail = etEmail.getText().toString().trim();
             String inputPassword = etPassword.getText().toString().trim();
             String inputConfirmPassword = confirmPassword.getText().toString().trim();
-            String inputPhoto = etPhoto.getText().toString().trim();
+            String inputPhoto = ""; // 移除输入框后，默认为空或设置默认头像URL
 
             if (TextUtils.isEmpty(inputAccount) || TextUtils.isEmpty(inputEmail) ||
                     TextUtils.isEmpty(inputPassword) || TextUtils.isEmpty(inputConfirmPassword)) {

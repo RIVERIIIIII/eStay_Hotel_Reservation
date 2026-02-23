@@ -478,13 +478,22 @@ public class HotelListActivity extends AppCompatActivity {
             tags.add("免费WiFi");
 
             list.add(new HotelModel(
-                    "Mock Hotel " + (i + 1),
-                    null, // No real URL for now
-                    300 + (i * 50),
-                    tags,
-                    1.5 + (i * 0.5),
-                    searchQuery.isLocationMode(), // Use isLocationMode flag from query
-                    4.0f + (i % 10) * 0.1f // Mock average rating (4.0 - 4.9)
+                    "mock_id_" + i, // id
+                    "Mock Hotel " + (i + 1), // name
+                    "Mock Hotel En " + (i + 1), // nameEn
+                    "Mock Address " + i, // address
+                    4, // starRating
+                    null, // roomTypes (empty for list)
+                    300 + (i * 50), // startPrice
+                    "08:00 - 22:00", // openingTime
+                    "Mock Description", // description
+                    tags, // amenities (using tags for now)
+                    null, // images
+                    null, // thumbnailUrl
+                    tags, // tags
+                    1.5 + (i * 0.5), // distanceKm
+                    searchQuery.isLocationMode(), // isCityCenter
+                    4.0f + (i % 10) * 0.1f // averageRating
             ));
         }
         return list;

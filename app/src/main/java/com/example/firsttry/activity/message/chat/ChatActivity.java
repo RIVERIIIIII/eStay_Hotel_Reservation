@@ -247,7 +247,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
                 messageJson.put("writer", currentUsername);
                 messageJson.put("receiver", conversationPartnerName);
                 messageJson.put("createtime", formattedTime);
-                webSocketManager.sendMessage(messageJson.toString());
+                webSocketManager.sendMessage(conversationPartnerName, content);
             } catch (JSONException e) {
                 Log.e("ChatActivity", "构造发送 JSON 失败", e);
             }

@@ -31,9 +31,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".activity.user.RegisterActivity"/>
         <activity android:name=".activity.utils.VideoActivity"/>
-        <activity android:name=".activity.reset_password.ResetPasswordActivity" />
         <activity android:name=".activity.reset_password.ForgetPasswordActivity" />
-        <activity android:name=".activity.reset_password.SetNewPasswordActivity" />
         <activity android:name=".activity.message.MessageActivity" />
         <activity android:name=".activity.message.chat.ChatActivity"/>
         <activity android:name=".activity.message.chat.remark.EditRemarkActivity" />
@@ -45,6 +43,7 @@
         <activity
             android:name=".activity.hotel.HotelDetailActivity"
             android:theme="@style/Theme.FirstTry" />
+        <activity android:name=".activity.hotel.BookingConfirmationActivity" />
     </application>
 
 </manifest>

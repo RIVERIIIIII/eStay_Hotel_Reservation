@@ -18,7 +18,7 @@ import com.example.firsttry.R;
 import com.example.firsttry.activity.hotel.adapter.BannerAdapter;
 import com.example.firsttry.activity.hotel.adapter.RoomTypeAdapter;
 import com.example.firsttry.activity.hotel.dialog.CalendarDialogFragment;
-import com.example.firsttry.activity.hotel.model.RoomType;
+import com.example.firsttry.activity.hotel.model.HotelModel;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -236,13 +236,25 @@ public class HotelDetailActivity extends AppCompatActivity {
         roomAdapter.notifyDataSetChanged();
     }
 
-    private List<RoomType> getMockRoomData() {
-        List<RoomType> list = new ArrayList<>();
-        list.add(new RoomType("雅致大床房", "1.8米大床 | 有窗", "30㎡", "1288", ""));
-        list.add(new RoomType("豪华双床房", "1.3米双床 | 有窗", "35㎡", "1488", ""));
-        list.add(new RoomType("行政套房", "2.0米特大床 | 全景落地窗", "60㎡", "2888", ""));
-        list.add(new RoomType("总统套房", "2.4米特大床 | 独立泳池", "120㎡", "8888", ""));
-        list.add(new RoomType("家庭亲子房", "1.8米大床 + 1.2米单人床", "45㎡", "1688", ""));
+    public String getCheckInDate() {
+        return checkInDate;
+    }
+
+    public String getCheckOutDate() {
+        return checkOutDate;
+    }
+
+    public long getTotalNights() {
+        return totalNights;
+    }
+
+    private List<HotelModel.RoomType> getMockRoomData() {
+        List<HotelModel.RoomType> list = new ArrayList<>();
+        list.add(new HotelModel.RoomType("雅致大床房", 1288, "1.8米大床 | 有窗 | 30㎡"));
+        list.add(new HotelModel.RoomType("豪华双床房", 1488, "1.3米双床 | 有窗 | 35㎡"));
+        list.add(new HotelModel.RoomType("行政套房", 2888, "2.0米特大床 | 全景落地窗 | 60㎡"));
+        list.add(new HotelModel.RoomType("总统套房", 8888, "2.4米特大床 | 独立泳池 | 120㎡"));
+        list.add(new HotelModel.RoomType("家庭亲子房", 1688, "1.8米大床 + 1.2米单人床 | 45㎡"));
         return list;
     }
 }

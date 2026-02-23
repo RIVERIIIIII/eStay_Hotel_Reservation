@@ -18,8 +18,72 @@ public class HotelSearchQuery implements Serializable {
     private int roomCount = 1;
     private int adultCount = 1;
     private int childCount = 0;
+    private List<String> quickTags;
+    private String sortBy;
+    private List<String> facilities;
+    private UserLocation userLocation;
+    private int page = 1;
+    private int pageSize = 10;
 
     public HotelSearchQuery() {
+    }
+
+    public static class UserLocation implements Serializable {
+        public double latitude;
+        public double longitude;
+
+        public UserLocation(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+    }
+
+    public List<String> getQuickTags() {
+        return quickTags;
+    }
+
+    public void setQuickTags(List<String> quickTags) {
+        this.quickTags = quickTags;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public List<String> getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(List<String> facilities) {
+        this.facilities = facilities;
+    }
+
+    public UserLocation getUserLocation() {
+        return userLocation;
+    }
+
+    public void setUserLocation(UserLocation userLocation) {
+        this.userLocation = userLocation;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public int getRoomCount() {
