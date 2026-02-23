@@ -419,7 +419,7 @@ public class HotelSearchActivity extends AppCompatActivity {
         
         quickFilterAdapter = new QuickFilterAdapter(quickFilters, activeFilters -> {
              // Single Selection Mode: Active filters will only contain the one clicked (or empty if deselected)
-             searchQuery.setTags(new ArrayList<>(activeFilters));
+             searchQuery.setQuickTags(new ArrayList<>(activeFilters));
              
              // Trigger search immediately if a tag is selected
              if (!activeFilters.isEmpty()) {

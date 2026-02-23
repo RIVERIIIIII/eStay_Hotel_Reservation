@@ -5,20 +5,14 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.example.firsttry.activity.hotel.model.HotelModel;
-<<<<<<< Updated upstream
-=======
 import com.example.firsttry.activity.hotel.model.HotelSearchQuery;
->>>>>>> Stashed changes
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-<<<<<<< Updated upstream
-=======
 import org.json.JSONArray;
->>>>>>> Stashed changes
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -121,66 +115,6 @@ public class HotelApi {
     }
 
     // 获取酒店列表
-<<<<<<< Updated upstream
-    public static void getHotelList(String city, String keyword, String checkInDate, String checkOutDate, int page, int limit, String sortBy, Integer minPrice, Integer maxPrice, Integer starRating, List<String> amenities, HotelListCallback callback) {
-        // 构建查询参数
-        StringBuilder urlBuilder = new StringBuilder(HttpClient.BASE_URL + "api/public/hotels?");
-        urlBuilder.append("page=").append(page);
-        urlBuilder.append("&limit=").append(limit);
-        if (city != null && !city.isEmpty()) {
-            urlBuilder.append("&city=").append(city);
-        }
-        if (keyword != null && !keyword.isEmpty()) {
-            urlBuilder.append("&keyword=").append(keyword);
-        }
-        if (checkInDate != null && !checkInDate.isEmpty()) {
-            urlBuilder.append("&checkInDate=").append(checkInDate);
-        }
-        if (checkOutDate != null && !checkOutDate.isEmpty()) {
-            urlBuilder.append("&checkOutDate=").append(checkOutDate);
-        }
-        if (minPrice != null) {
-            urlBuilder.append("&minPrice=").append(minPrice);
-        }
-        if (maxPrice != null) {
-            urlBuilder.append("&maxPrice=").append(maxPrice);
-        }
-        if (starRating != null) {
-            urlBuilder.append("&starRating=").append(starRating);
-        }
-        if (amenities != null && !amenities.isEmpty()) {
-            // 将设施列表转换为逗号分隔的字符串
-            String amenitiesStr = String.join(",", amenities);
-            urlBuilder.append("&amenities=").append(amenitiesStr);
-        }
-        // 添加排序参数
-        if (sortBy != null && !sortBy.isEmpty()) {
-            String sorterParam = "";
-            switch (sortBy) {
-                case "price_asc":
-                    sorterParam = "price_asc";
-                    break;
-                case "price_desc":
-                    sorterParam = "price_desc";
-                    break;
-                case "recommend":
-                    // 推荐排序，不传递sorter参数，使用默认的按创建时间降序
-                    break;
-                case "distance":
-                    // 距离排序，暂时不支持
-                    break;
-            }
-            if (!sorterParam.isEmpty()) {
-                urlBuilder.append("&sorter=").append(sorterParam);
-            }
-        }
-        
-        String url = urlBuilder.toString();
-        Log.d(TAG, "GET: " + url);
-
-        Request request = new Request.Builder()
-                .url(url)
-=======
     public static void getHotelList(HotelSearchQuery query, HotelListCallback callback) {
         String url = HttpClient.BASE_URL + "api/public/hotels";
         
@@ -242,7 +176,6 @@ public class HotelApi {
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
->>>>>>> Stashed changes
                 .build();
 
         client.newCall(request).enqueue(new Callback() {

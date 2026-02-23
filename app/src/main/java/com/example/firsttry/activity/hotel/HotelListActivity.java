@@ -399,19 +399,19 @@ public class HotelListActivity extends AppCompatActivity {
         quickFilters.add("4.8分+");
         
         quickFilterAdapter = new QuickFilterAdapter(quickFilters, activeFilters -> {
-            List<String> currentTags = searchQuery.getTags();
+            List<String> currentTags = searchQuery.getQuickTags();
             if (currentTags == null) currentTags = new ArrayList<>();
             
             List<String> finalTags = new ArrayList<>(currentTags);
             finalTags.removeAll(quickFilters);
             finalTags.addAll(activeFilters);
             
-            searchQuery.setTags(finalTags);
+            searchQuery.setQuickTags(finalTags);
             refreshList();
         });
         
         // Sync initial state from searchQuery (passed from Search Activity)
-        List<String> currentTags = searchQuery.getTags();
+        List<String> currentTags = searchQuery.getQuickTags();
         if (currentTags != null) {
             for (String tag : currentTags) {
                 if (quickFilters.contains(tag)) {
@@ -436,36 +436,13 @@ public class HotelListActivity extends AppCompatActivity {
         // 显示加载提示
         Toast.makeText(this, "正在刷新列表...", Toast.LENGTH_SHORT).show();
         
-        // 处理价格筛选参数
-        Integer minPrice = null;
-        Integer maxPrice = null;
-        if (searchQuery.getMinPrice() > 0) {
-            minPrice = searchQuery.getMinPrice();
-        }
-        if (searchQuery.getMaxPrice() > 0) {
-            maxPrice = searchQuery.getMaxPrice();
-        }
-        
-        // 处理星级筛选参数
-        Integer starRating = null;
-        if (searchQuery.getStarRating() > 0) {
-            starRating = searchQuery.getStarRating();
-        }
+        // 更新查询参数
+        searchQuery.setSortBy(currentSort);
+        searchQuery.setPage(1);
+        searchQuery.setPageSize(20);
         
         // 从API获取酒店数据
-        HotelApi.getHotelList(
-            searchQuery.getCity(),
-            searchQuery.getKeyword(),
-            searchQuery.getCheckInDate(),
-            searchQuery.getCheckOutDate(),
-            1, // 页码，默认第一页
-            20, // 每页数量，默认20条
-            currentSort, // 排序方式
-            minPrice, // 最低价格
-            maxPrice, // 最高价格
-            starRating, // 星级
-            searchQuery.getTags(), // 设施标签
-            new HotelApi.HotelListCallback() {
+        HotelApi.getHotelList(searchQuery, new HotelApi.HotelListCallback() {
                 @Override
                 public void onSuccess(List<HotelModel> hotels) {
                     // 更新酒店列表
