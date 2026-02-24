@@ -90,7 +90,7 @@ public class HotelApi {
                         List<HotelModel> hotels = new ArrayList<>();
                         for (JsonElement hotelElement : hotelsArray) {
                             JsonObject hotelJson = hotelElement.getAsJsonObject();
-                            HotelModel hotel = parseHotelJson(hotelJson);
+                            HotelModel hotel = parseHotelJson(hotelJson, false);
                             if (hotel != null) {
                                 hotels.add(hotel);
                             }
@@ -118,64 +118,53 @@ public class HotelApi {
     public static void getHotelList(HotelSearchQuery query, HotelListCallback callback) {
         String url = HttpClient.BASE_URL + "api/public/hotels";
         
-        JSONObject jsonBody = new JSONObject();
-        try {
-            if (query.getCity() != null) jsonBody.put("city", query.getCity());
-            jsonBody.put("locationMode", query.isLocationMode());
-            if (query.isLocationMode()) {
-                jsonBody.put("latitude", query.getLatitude());
-                jsonBody.put("longitude", query.getLongitude());
-            }
-            if (query.getKeyword() != null) jsonBody.put("keyword", query.getKeyword());
-            if (query.getCheckInDate() != null) jsonBody.put("checkInDate", query.getCheckInDate());
-            if (query.getCheckOutDate() != null) jsonBody.put("checkOutDate", query.getCheckOutDate());
-            
-            jsonBody.put("roomCount", query.getRoomCount());
-            jsonBody.put("adultCount", query.getAdultCount());
-            jsonBody.put("childCount", query.getChildCount());
-            
-            if (query.getMinPrice() > 0) jsonBody.put("minPrice", query.getMinPrice());
-            if (query.getMaxPrice() > 0) jsonBody.put("maxPrice", query.getMaxPrice());
-            if (query.getStarRating() > 0) jsonBody.put("starRating", query.getStarRating());
-            
-            if (query.getQuickTags() != null && !query.getQuickTags().isEmpty()) {
-                JSONArray tags = new JSONArray();
-                for (String t : query.getQuickTags()) tags.put(t);
-                jsonBody.put("quickTags", tags);
-            }
-            
-            if (query.getSortBy() != null) jsonBody.put("sortBy", query.getSortBy());
-            
-            if (query.getFacilities() != null && !query.getFacilities().isEmpty()) {
-                JSONArray facilities = new JSONArray();
-                for (String f : query.getFacilities()) facilities.put(f);
-                jsonBody.put("facilities", facilities);
-            }
-            
-            if (query.getUserLocation() != null) {
-                JSONObject loc = new JSONObject();
-                loc.put("latitude", query.getUserLocation().latitude);
-                loc.put("longitude", query.getUserLocation().longitude);
-                jsonBody.put("userLocation", loc);
-            }
-            
-            jsonBody.put("page", query.getPage());
-            jsonBody.put("pageSize", query.getPageSize());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            if (callback != null) {
-                callback.onError("Constructing request failed");
-            }
-            return;
+        // 构建URL参数
+        okhttp3.HttpUrl.Builder urlBuilder = okhttp3.HttpUrl.parse(url).newBuilder();
+        
+        if (query.getCity() != null) urlBuilder.addQueryParameter("city", query.getCity());
+        
+        // 注意：后端似乎不直接支持 locationMode, latitude, longitude 在查询参数中进行复杂的地理位置过滤
+        // 如果后端支持，应该添加。这里暂时保留原有逻辑的意图，但作为 query param 可能无效
+        // 建议后端增加对 lat/lng 的支持。目前先作为 query param 传递。
+        if (query.isLocationMode()) {
+            urlBuilder.addQueryParameter("latitude", String.valueOf(query.getLatitude()));
+            urlBuilder.addQueryParameter("longitude", String.valueOf(query.getLongitude()));
         }
+        
+        if (query.getKeyword() != null) urlBuilder.addQueryParameter("keyword", query.getKeyword());
+        if (query.getCheckInDate() != null) urlBuilder.addQueryParameter("checkInDate", query.getCheckInDate());
+        if (query.getCheckOutDate() != null) urlBuilder.addQueryParameter("checkOutDate", query.getCheckOutDate());
+        
+        // 房间/人数信息 (后端未明确列出支持，但作为 query 传递无害)
+        urlBuilder.addQueryParameter("roomCount", String.valueOf(query.getRoomCount()));
+        urlBuilder.addQueryParameter("adultCount", String.valueOf(query.getAdultCount()));
+        urlBuilder.addQueryParameter("childCount", String.valueOf(query.getChildCount()));
+        
+        if (query.getMinPrice() > 0) urlBuilder.addQueryParameter("minPrice", String.valueOf(query.getMinPrice()));
+        if (query.getMaxPrice() > 0) urlBuilder.addQueryParameter("maxPrice", String.valueOf(query.getMaxPrice()));
+        if (query.getStarRating() > 0) urlBuilder.addQueryParameter("starRating", String.valueOf(query.getStarRating()));
+        
+        // 设施/标签
+        // 将 quickTags 和 facilities 合并传给 amenities 参数
+        List<String> allAmenities = new ArrayList<>();
+        if (query.getQuickTags() != null) allAmenities.addAll(query.getQuickTags());
+        if (query.getFacilities() != null) allAmenities.addAll(query.getFacilities());
+        
+        for (String amenity : allAmenities) {
+            urlBuilder.addQueryParameter("amenities", amenity);
+        }
+        
+        if (query.getSortBy() != null) urlBuilder.addQueryParameter("sortBy", query.getSortBy());
+        
+        urlBuilder.addQueryParameter("page", String.valueOf(query.getPage()));
+        urlBuilder.addQueryParameter("pageSize", String.valueOf(query.getPageSize()));
 
-        RequestBody body = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json; charset=utf-8"));
-        Log.d(TAG, "POST: " + url);
+        String finalUrl = urlBuilder.build().toString();
+        Log.d(TAG, "GET: " + finalUrl);
 
         Request request = new Request.Builder()
-                .url(url)
-                .post(body)
+                .url(finalUrl)
+                .get()
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -200,7 +189,7 @@ public class HotelApi {
                         List<HotelModel> hotels = new ArrayList<>();
                         for (JsonElement hotelElement : hotelsArray) {
                             JsonObject hotelJson = hotelElement.getAsJsonObject();
-                            HotelModel hotel = parseHotelJson(hotelJson);
+                            HotelModel hotel = parseHotelJson(hotelJson, query.isLocationMode());
                             if (hotel != null) {
                                 hotels.add(hotel);
                             }
@@ -251,7 +240,7 @@ public class HotelApi {
                     try {
                         JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
                         JsonObject hotelJson = jsonObject.getAsJsonObject("hotel");
-                        HotelModel hotel = parseHotelJson(hotelJson);
+                        HotelModel hotel = parseHotelJson(hotelJson, false);
                         
                         if (hotel != null) {
                             if (callback != null) {
@@ -351,7 +340,7 @@ public class HotelApi {
     }
 
     // 将JSON对象转换为HotelModel
-    private static HotelModel parseHotelJson(JsonObject hotelJson) {
+    private static HotelModel parseHotelJson(JsonObject hotelJson, boolean isLocationMode) {
         try {
             // 获取酒店ID
             String id = hotelJson.get("_id").getAsString();
@@ -418,9 +407,21 @@ public class HotelApi {
                 tags.addAll(amenities.subList(0, Math.min(2, amenities.size())));
             }
             
-            // 设置默认距离和评分
-            double distanceKm = Math.round(Math.random() * 10 * 10) / 10.0; // 0-10公里随机
-            boolean isCityCenter = Math.random() > 0.5;
+            // 设置距离和位置显示逻辑
+            // 距离：尝试从后端获取真实距离，如果不存在则默认为0
+            double distanceKm = 0.0;
+            if (hotelJson.has("distance") && !hotelJson.get("distance").isJsonNull()) {
+                distanceKm = hotelJson.get("distance").getAsDouble();
+                // 如果后端返回的是米，转换为千米 (假设后端可能返回米)
+                // 但根据通常API设计，我们假设它已经是km或我们可以直接使用
+                // 这里假设是km，如果数值很大可能是米，暂时按km处理
+            }
+            
+            // 距离类型：根据查询模式决定
+            // 如果是定位模式(isLocationMode=true)，则显示"距离我" -> isCityCenter=false
+            // 如果是城市模式(isLocationMode=false)，则显示"距离市中心" -> isCityCenter=true
+            boolean isCityCenter = !isLocationMode;
+
             // 从服务器获取真实评分数据，如果没有评分则设为0
             float averageRating = 0.0f;
             if (hotelJson.has("averageRating")) {

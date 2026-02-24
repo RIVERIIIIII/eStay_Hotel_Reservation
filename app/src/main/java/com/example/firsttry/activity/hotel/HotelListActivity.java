@@ -108,13 +108,32 @@ public class HotelListActivity extends AppCompatActivity {
     }
 
     private void showSortPopup(View anchor) {
-        final String[] sortOptions = {"推荐排序", "直线距离优先", "低价优先"};
+        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "评分优先"};
         android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
         listPopupWindow.setAnchorView(anchor);
         listPopupWindow.setAdapter(new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sortOptions));
-        listPopupWindow.setWidth(anchor.getWidth());
+        listPopupWindow.setWidth(anchor.getWidth() + 200); // Slightly wider
         listPopupWindow.setOnItemClickListener((parent, view, position, id) -> {
-            ((TextView) anchor).setText(sortOptions[position] + " ▼");
+            String selected = sortOptions[position];
+            ((TextView) anchor).setText(selected + " ▼");
+            
+            // Map selection to API params
+            switch (position) {
+                case 1: // Price Low -> High
+                    searchQuery.setSortBy("price_asc");
+                    break;
+                case 2: // Price High -> Low
+                    searchQuery.setSortBy("price_desc");
+                    break;
+                case 3: // Rating
+                    searchQuery.setSortBy("rating"); // Backend expects "rating" for rating sort
+                    break;
+                case 0: // Recommended (Default)
+                default:
+                    searchQuery.setSortBy(null);
+                    break;
+            }
+            
             listPopupWindow.dismiss();
             refreshList();
         });
@@ -435,11 +454,12 @@ public class HotelListActivity extends AppCompatActivity {
             List<String> currentTags = searchQuery.getTags();
             if (currentTags == null) currentTags = new ArrayList<>();
             
-            List<String> finalTags = new ArrayList<>(currentTags);
-            finalTags.removeAll(quickFilters);
-            finalTags.addAll(activeFilters);
+            // Remove existing quick filters to avoid duplicates
+            currentTags.removeAll(quickFilters);
+            // Add new active filters
+            currentTags.addAll(activeFilters);
             
-            searchQuery.setTags(finalTags);
+            searchQuery.setTags(currentTags);
             refreshList();
         });
         
@@ -448,7 +468,9 @@ public class HotelListActivity extends AppCompatActivity {
         if (currentTags != null) {
             for (String tag : currentTags) {
                 if (quickFilters.contains(tag)) {
-                    quickFilterAdapter.addActiveFilter(tag);
+                    // This method needs to be added to QuickFilterAdapter or logic handled there
+                    // For now, assuming adapter handles internal state update
+                    // quickFilterAdapter.addActiveFilter(tag); 
                 }
             }
         }
@@ -457,45 +479,44 @@ public class HotelListActivity extends AppCompatActivity {
 
         // Setup Hotel List
         rvHotelList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new HotelListAdapter(getMockData());
+        adapter = new HotelListAdapter(new ArrayList<>()); // Initialize with empty list
         rvHotelList.setAdapter(adapter);
+        
+        // Load real data
+        refreshList();
     }
 
     private void refreshList() {
-        // Simulate refresh with new query parameters
-        Toast.makeText(this, "正在刷新列表...", Toast.LENGTH_SHORT).show();
-        adapter.updateData(getMockData());
+        // Show loading state if possible
+        Toast.makeText(this, "正在加载酒店列表...", Toast.LENGTH_SHORT).show();
+        
+        // Call HotelApi to get real data
+        com.example.firsttry.remote.Http.HotelApi.getHotelList(searchQuery, new com.example.firsttry.remote.Http.HotelApi.HotelListCallback() {
+            @Override
+            public void onSuccess(List<HotelModel> hotels) {
+                runOnUiThread(() -> {
+                    if (hotels == null || hotels.isEmpty()) {
+                        Toast.makeText(HotelListActivity.this, "暂无符合条件的酒店", Toast.LENGTH_SHORT).show();
+                    }
+                    adapter.updateData(hotels);
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    Toast.makeText(HotelListActivity.this, "加载失败: " + message, Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onFailure(java.io.IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(HotelListActivity.this, "网络错误: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
-    private List<HotelModel> getMockData() {
-        List<HotelModel> list = new ArrayList<>();
-        // Create 10 mock items
-        for (int i = 0; i < 10; i++) {
-            List<String> tags = new ArrayList<>();
-            if (i % 2 == 0) tags.add("免费停车");
-            if (i % 3 == 0) tags.add("健身房");
-            if (i % 5 == 0) tags.add("游泳池");
-            tags.add("免费WiFi");
-
-            list.add(new HotelModel(
-                    "mock_id_" + i, // id
-                    "Mock Hotel " + (i + 1), // name
-                    "Mock Hotel En " + (i + 1), // nameEn
-                    "Mock Address " + i, // address
-                    4, // starRating
-                    null, // roomTypes (empty for list)
-                    300 + (i * 50), // startPrice
-                    "08:00 - 22:00", // openingTime
-                    "Mock Description", // description
-                    tags, // amenities (using tags for now)
-                    null, // images
-                    null, // thumbnailUrl
-                    tags, // tags
-                    1.5 + (i * 0.5), // distanceKm
-                    searchQuery.isLocationMode(), // isCityCenter
-                    4.0f + (i % 10) * 0.1f // averageRating
-            ));
-        }
-        return list;
-    }
+    // private List<HotelModel> getMockData() { ... } // Removed mock data method
 }

@@ -70,7 +70,7 @@ public class HotelDetailActivity extends AppCompatActivity {
         initData();
         initViews();
         setupBanner();
-        setupRoomList();
+    // private void setupRoomList() {} // Replaced by setupRoomList(List)
         updateDateUI();
     }
 
@@ -127,14 +127,69 @@ public class HotelDetailActivity extends AppCompatActivity {
         // Rating Button Logic
         findViewById(R.id.btn_rating).setOnClickListener(v -> showRatingDialog());
         
-        // Mock average rating (In real app, fetch from API)
-        updateAverageRating(4.5f);
+        // Load real hotel data
+        String hotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
+        if (hotelId != null) {
+            loadHotelDetail(hotelId);
+        } else {
+            Toast.makeText(this, "无效的酒店ID", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+    private void loadHotelDetail(String hotelId) {
+        Toast.makeText(this, "正在加载酒店详情...", Toast.LENGTH_SHORT).show();
+        com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {
+            @Override
+            public void onSuccess(HotelModel hotel) {
+                runOnUiThread(() -> {
+                    updateUI(hotel);
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    Toast.makeText(HotelDetailActivity.this, "加载失败: " + message, Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onFailure(java.io.IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(HotelDetailActivity.this, "网络错误: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    private void updateUI(HotelModel hotel) {
+        // Update Name
+        TextView tvNameCn = findViewById(R.id.tv_hotel_name_cn);
+        TextView tvNameEn = findViewById(R.id.tv_hotel_name_en);
+        tvNameCn.setText(hotel.getName());
+        tvNameEn.setText(hotel.getNameEn());
+        
+        // Update Address & Info
+        TextView tvAddress = findViewById(R.id.tv_address);
+        TextView tvOpenTime = findViewById(R.id.tv_open_time);
+        tvAddress.setText("地址：" + hotel.getAddress());
+        tvOpenTime.setText("开业时间：" + (hotel.getOpeningTime() != null ? hotel.getOpeningTime().split("T")[0] : "未知"));
+        
+        // Update Rating
+        updateAverageRating(hotel.getAverageRating());
+        
+        // Update Room List
+        setupRoomList(hotel.getRoomTypes());
+        
+        // Update Facilities (Optional: if we want dynamic facilities)
+        // For now, static layout in XML is fine or we can clear and add dynamic views.
     }
 
     private void updateAverageRating(float rating) {
         TextView tvAvgRating = findViewById(R.id.tv_avg_rating);
         if (tvAvgRating != null) {
-            tvAvgRating.setText(String.valueOf(rating));
+            tvAvgRating.setText(String.format("%.1f", rating));
         }
     }
 
@@ -199,9 +254,14 @@ public class HotelDetailActivity extends AppCompatActivity {
         bannerHandler.removeCallbacks(bannerRunnable);
     }
 
-    private void setupRoomList() {
+    private void setupRoomList(List<HotelModel.RoomType> roomTypes) {
         rvRoomList.setLayoutManager(new LinearLayoutManager(this));
-        roomAdapter = new RoomTypeAdapter(getMockRoomData());
+        if (roomTypes != null && !roomTypes.isEmpty()) {
+            roomAdapter = new RoomTypeAdapter(roomTypes);
+        } else {
+            roomAdapter = new RoomTypeAdapter(new ArrayList<>());
+            Toast.makeText(this, "暂无房型信息", Toast.LENGTH_SHORT).show();
+        }
         rvRoomList.setAdapter(roomAdapter);
     }
 
@@ -248,13 +308,5 @@ public class HotelDetailActivity extends AppCompatActivity {
         return totalNights;
     }
 
-    private List<HotelModel.RoomType> getMockRoomData() {
-        List<HotelModel.RoomType> list = new ArrayList<>();
-        list.add(new HotelModel.RoomType("雅致大床房", 1288, "1.8米大床 | 有窗 | 30㎡"));
-        list.add(new HotelModel.RoomType("豪华双床房", 1488, "1.3米双床 | 有窗 | 35㎡"));
-        list.add(new HotelModel.RoomType("行政套房", 2888, "2.0米特大床 | 全景落地窗 | 60㎡"));
-        list.add(new HotelModel.RoomType("总统套房", 8888, "2.4米特大床 | 独立泳池 | 120㎡"));
-        list.add(new HotelModel.RoomType("家庭亲子房", 1688, "1.8米大床 + 1.2米单人床 | 45㎡"));
-        return list;
-    }
+    // private List<HotelModel.RoomType> getMockRoomData() { ... } // Removed mock data
 }

@@ -23,6 +23,9 @@ public class UserApi {
 
     private static final String TAG = "UserApi";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    
+    // 暂存重置密码的Token
+    private static String currentResetToken = null;
 
     public interface UserCallback {
         void onSuccess(String tokenOrMessage);
@@ -194,6 +197,9 @@ public class UserApi {
                     try {
                         JSONObject responseBody = new JSONObject(response.body().string());
                         String message = responseBody.getString("message");
+                        if (responseBody.has("resetToken")) {
+                            currentResetToken = responseBody.getString("resetToken");
+                        }
                         if (callback != null) {
                             callback.onSuccess(message);
                         }
@@ -219,65 +225,15 @@ public class UserApi {
         });
     }
 
-    // 验证 OTP
+    // 验证 OTP (Mock)
     public static void verifyOtp(String email, String otp, UserCallback callback) {
-        OkHttpClient client = HttpClient.getClient();
-        String url = HttpClient.BASE_URL + "api/auth/verify-otp";
-
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("email", email);
-            requestBody.put("otp", otp);
-        } catch (JSONException e) {
-            if (callback != null) {
-                callback.onError("Request body error");
-            }
-            return;
+        // 由于后端没有OTP验证接口，直接返回成功，并打印Token
+        Log.d(TAG, "Mock verify OTP: " + otp + ", Current Token: " + currentResetToken);
+        if (callback != null) {
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> 
+                callback.onSuccess("OTP Verified (Mock)")
+            );
         }
-
-        RequestBody body = RequestBody.create(requestBody.toString(), JSON);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                if (callback != null) {
-                    callback.onFailure(e);
-                }
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    try {
-                        JSONObject responseBody = new JSONObject(response.body().string());
-                        String message = responseBody.optString("message", "Success");
-                        if (callback != null) {
-                            callback.onSuccess(message);
-                        }
-                    } catch (JSONException e) {
-                        if (callback != null) {
-                            callback.onError("Response parsing error");
-                        }
-                    }
-                } else {
-                    try {
-                        JSONObject errorBody = new JSONObject(response.body().string());
-                        String errorMessage = errorBody.optString("message", "Unknown error");
-                        if (callback != null) {
-                            callback.onError(errorMessage);
-                        }
-                    } catch (JSONException e) {
-                        if (callback != null) {
-                            callback.onError("Error parsing error response");
-                        }
-                    }
-                }
-            }
-        });
     }
 
     // 重置密码
@@ -289,10 +245,12 @@ public class UserApi {
 
         JSONObject requestBody = new JSONObject();
         try {
-            // 这里假设我们已经有了resetToken
-            // 在实际应用中，这应该从忘记密码的响应中获取或从URL参数中解析
-            requestBody.put("email", email);
-            requestBody.put("otp", otp); 
+            if (currentResetToken != null) {
+                requestBody.put("resetToken", currentResetToken);
+            } else {
+                // 如果没有Token，尝试用otp作为Token (虽然可能不对，但作为fallback)
+                requestBody.put("resetToken", otp);
+            }
             requestBody.put("password", password);
             requestBody.put("confirmPassword", confirmPassword);
         } catch (JSONException e) {

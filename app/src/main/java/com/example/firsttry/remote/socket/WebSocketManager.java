@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,12 +84,16 @@ public class WebSocketManager {
             return;
         }
         
-        // 创建消息对象
-        JSONObject message = new JSONObject();
-        message.put("senderId", currentUserId);
-        message.put("receiverId", receiverId);
-        message.put("content", content);
-        mSocket.emit("sendMessage", message);
+        try {
+            // 创建消息对象
+            JSONObject message = new JSONObject();
+            message.put("senderId", currentUserId);
+            message.put("receiverId", receiverId);
+            message.put("content", content);
+            mSocket.emit("sendMessage", message);
+        } catch (JSONException e) {
+            Log.e(TAG, "发送消息失败: " + e.getMessage());
+        }
     }
 
     // 添加监听器
@@ -184,24 +189,6 @@ public class WebSocketManager {
             if (listener != null) {
                 listener.onWebSocketStatusChanged(status);
             }
-        }
-    }
-
-    // 内部类：简化JSON操作
-    private static class JSONObject {
-        private final java.util.HashMap<String, Object> map = new java.util.HashMap<>();
-        
-        public void put(String key, String value) {
-            map.put(key, value);
-        }
-        
-        public void put(String key, Object value) {
-            map.put(key, value);
-        }
-        
-        @Override
-        public String toString() {
-            return new org.json.JSONObject(map).toString();
         }
     }
 }
