@@ -5,7 +5,8 @@ import {
   getHotels, 
   getHotelById, 
   updateHotel, 
-  deleteHotel 
+  deleteHotel,
+  uploadImages
 } from '../controllers/hotelController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
@@ -48,5 +49,8 @@ router.put('/:id', [
 
 // 删除酒店
 router.delete('/:id', deleteHotel);
+
+// 上传酒店图片
+router.post('/upload', uploadImages);
 
 export default router;

@@ -12,8 +12,9 @@ const router = express.Router();
 // 获取推荐酒店（用于首页Banner）
 router.get('/featured', getFeaturedHotels);
 
-// 获取酒店列表（支持筛选）
+// 获取酒店列表（支持筛选，同时支持GET和POST方法）
 router.get('/', getMobileHotels);
+router.post('/', getMobileHotels);
 
 // 获取单个酒店详情
 router.get('/:id', getMobileHotelById);

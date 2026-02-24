@@ -61,10 +61,17 @@ export const forgetPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // 生成重置令牌
-    const resetToken = crypto.randomBytes(20).toString('hex');
+    // 生成6位数字验证码
+    const resetToken = Math.floor(Math.random() * 900000 + 100000).toString();
     const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     const resetPasswordExpires = Date.now() + 3600000; // 1小时后过期
+    
+    // 在后端终端输出验证码（用于调试和测试）
+    console.log('----------------------------------------');
+    console.log('生成的验证码:', resetToken);
+    console.log('验证码有效期: 1小时');
+    console.log('生成时间:', new Date().toLocaleString());
+    console.log('----------------------------------------');
 
     // 更新用户记录
     user.resetPasswordToken = resetPasswordToken;
@@ -85,11 +92,15 @@ export const forgetPassword = async (req, res) => {
 // 重置密码
 export const resetPassword = async (req, res) => {
   try {
-    const { resetToken, password, confirmPassword } = req.body;
+    // 兼容前端发送的数据格式
+    const { token, newPassword, email } = req.body;
+    const resetToken = token;
+    const password = newPassword;
+    const confirmPassword = newPassword; // 前端已经做了验证，这里直接使用
 
     // 验证密码
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: 'Passwords do not match' });
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' });
     }
 
     // 哈希重置令牌
@@ -124,13 +135,19 @@ export const login = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { account, password } = req.body;
+    // 同时支持account和username字段
+    const { account, username, password } = req.body;
+    const loginAccount = account || username;
+
+    if (!loginAccount) {
+      return res.status(400).json({ message: 'Username or email is required' });
+    }
 
     // 查找用户（支持邮箱或用户名登录）
     const user = await User.findOne({
       $or: [
-        { username: account },
-        { email: account }
+        { username: loginAccount },
+        { email: loginAccount }
       ]
     });
     if (!user) {

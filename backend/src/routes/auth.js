@@ -22,8 +22,14 @@ router.post('/register', [
 
 // 登录路由
 router.post('/login', [
-  body('account').notEmpty().withMessage('Username or email is required'),
-  body('password').notEmpty().withMessage('Password is required')
+  body('password').notEmpty().withMessage('Password is required'),
+  // 支持account或username字段
+  body('account').custom((value, { req }) => {
+    if (!value && !req.body.username) {
+      throw new Error('Username or email is required');
+    }
+    return true;
+  })
 ], login);
 
 // 获取当前用户信息

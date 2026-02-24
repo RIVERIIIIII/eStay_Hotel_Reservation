@@ -127,3 +127,57 @@ export const getAllHotels = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const publishHotel = async (req, res) => {
+  try {
+    const hotel = await Hotel.findByIdAndUpdate(
+      req.params.id,
+      { 
+        status: 'published' // 设置为已发布状态
+      },
+      { new: true, runValidators: true }
+    ).populate('createdBy', 'username role');
+
+    if (!hotel) {
+      return res.status(404).json({ message: 'Hotel not found' });
+    }
+
+    res.json({
+      message: 'Hotel published successfully',
+      hotel: {
+        id: hotel._id,
+        name: hotel.name,
+        status: hotel.status
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const offlineHotel = async (req, res) => {
+  try {
+    const hotel = await Hotel.findByIdAndUpdate(
+      req.params.id,
+      { 
+        status: 'offline' // 设置为下线状态
+      },
+      { new: true, runValidators: true }
+    ).populate('createdBy', 'username role');
+
+    if (!hotel) {
+      return res.status(404).json({ message: 'Hotel not found' });
+    }
+
+    res.json({
+      message: 'Hotel taken offline successfully',
+      hotel: {
+        id: hotel._id,
+        name: hotel.name,
+        status: hotel.status
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

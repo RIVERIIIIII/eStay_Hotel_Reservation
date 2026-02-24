@@ -1,5 +1,6 @@
 import { validationResult } from 'express-validator';
 import Message from '../models/Message.js';
+import { io } from '../server.js';
 
 // 获取用户消息列表
 export const getMessages = async (req, res) => {
@@ -64,6 +65,13 @@ export const sendMessage = async (req, res) => {
     const populatedMessage = await Message.findById(message._id)
       .populate('senderId', 'username email')
       .populate('receiverId', 'username email');
+
+    // 通过WebSocket发送实时消息通知
+    const receiverIdStr = receiverId.toString();
+    const senderIdStr = req.user._id.toString();
+    
+    io.to(receiverIdStr).emit('newMessage', populatedMessage);
+    io.to(senderIdStr).emit('newMessage', populatedMessage);
 
     res.status(201).json({
       message: 'Message sent successfully',

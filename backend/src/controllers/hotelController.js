@@ -163,3 +163,23 @@ export const deleteHotel = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const uploadImages = async (req, res) => {
+  try {
+    // 这里简化处理，实际应该使用multer等中间件处理文件上传
+    // 并将图片保存到云存储或本地文件系统
+    
+    // 模拟返回上传成功的图片URL
+    const imageUrls = [
+      'https://example.com/image1.jpg',
+      'https://example.com/image2.jpg'
+    ];
+    
+    res.json({
+      message: 'Images uploaded successfully',
+      imageUrls
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

@@ -36,7 +36,17 @@ const hotelSchema = new mongoose.Schema({
       required: true,
       min: 0
     },
-    description: String
+    description: String,
+    // 记录当前房间的占用情况
+    occupied: {
+      type: {
+        checkInDate: Date,
+        checkOutDate: Date,
+        bookingId: mongoose.Schema.Types.ObjectId,
+        customerId: mongoose.Schema.Types.ObjectId
+      },
+      default: null
+    }
   }],
   price: {
     type: Number,
@@ -53,7 +63,7 @@ const hotelSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected','published','offline'],
     default: 'pending'
   },
   createdBy: {

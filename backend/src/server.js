@@ -54,7 +54,7 @@ app.use('*', (req, res) => {
 const server = http.createServer(app);
 
 // 初始化Socket.io服务器
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],

@@ -1,7 +1,8 @@
 import express from 'express';
 import { 
   createBooking, 
-  getUserBookings 
+  getUserBookings,
+  cancelBooking 
 } from '../controllers/mobileController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
@@ -14,5 +15,8 @@ router.post('/', authenticateToken, createBooking);
 
 // 获取用户预定列表
 router.get('/', authenticateToken, getUserBookings);
+
+// 取消预定
+router.put('/:id/cancel', authenticateToken, cancelBooking);
 
 export default router;
