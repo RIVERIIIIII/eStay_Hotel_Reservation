@@ -21,6 +21,8 @@ import com.google.android.material.chip.Chip;
 import android.content.Intent;
 import com.example.firsttry.activity.hotel.HotelDetailActivity;
 
+import com.example.firsttry.activity.hotel.HotelListActivity;
+
 public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.HotelViewHolder> {
 
     private List<HotelModel> hotelList;
@@ -135,8 +137,16 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(itemView.getContext(), HotelDetailActivity.class);
                 intent.putExtra(HotelDetailActivity.EXTRA_HOTEL_ID, hotel.getId()); // Use real ID
-                // Dates? We don't have access to search query here easily unless passed.
-                // For now, let HotelDetailActivity use defaults.
+                
+                // Pass dates from HotelListActivity if available
+                if (itemView.getContext() instanceof HotelListActivity) {
+                    HotelListActivity activity = (HotelListActivity) itemView.getContext();
+                    if (activity.getSearchQuery() != null) {
+                        intent.putExtra(HotelDetailActivity.EXTRA_CHECK_IN, activity.getSearchQuery().getCheckInDate());
+                        intent.putExtra(HotelDetailActivity.EXTRA_CHECK_OUT, activity.getSearchQuery().getCheckOutDate());
+                    }
+                }
+                
                 itemView.getContext().startActivity(intent);
             });
         }
