@@ -19,6 +19,18 @@ const hotelSchema = new mongoose.Schema({
     trim: true,
     maxlength: 200
   },
+  // 酒店地理位置（经纬度）
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      default: [0, 0]
+    }
+  },
   starRating: {
     type: Number,
     required: true,
@@ -97,6 +109,9 @@ const hotelSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// 创建地理空间索引，支持地理位置查询
+hotelSchema.index({ location: '2dsphere' });
 
 // 添加索引以提高查询性能
 hotelSchema.index({ createdBy: 1, createdAt: -1 });

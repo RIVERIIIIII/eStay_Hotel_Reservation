@@ -11,6 +11,7 @@ import publicHotelRoutes from './routes/publicHotels.js';
 import bookingRoutes from './routes/booking.js';
 import messageRoutes from './routes/message.js';
 import ratingRoutes from './routes/rating.js';
+import mobileRoutes from './routes/mobile.js';
 
 // 加载环境变量
 dotenv.config();
@@ -33,6 +34,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/ratings', ratingRoutes);
+app.use('/api/mobile', mobileRoutes);
 
 // 健康检查端点
 app.get('/api/health', (req, res) => {

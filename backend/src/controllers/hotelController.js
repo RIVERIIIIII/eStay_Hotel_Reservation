@@ -9,30 +9,41 @@ export const createHotel = async (req, res) => {
     }
 
     const {
-      name,
-      name_en,
-      address,
-      starRating,
-      roomTypes,
-      price,
-      openingTime,
-      description,
-      amenities = []
-    } = req.body;
+    name,
+    name_en,
+    address,
+    starRating,
+    roomTypes,
+    price,
+    openingTime,
+    description,
+    amenities = [],
+    longitude,
+    latitude
+  } = req.body;
 
-    const hotel = new Hotel({
-      name,
-      name_en,
-      address,
-      starRating,
-      roomTypes,
-      price,
-      openingTime,
-      description,
-      amenities,
-      createdBy: req.user._id,
-      status: req.user.role === 'admin' ? 'approved' : 'pending'
-    });
+  // 创建酒店对象，包括地理位置信息
+  const hotel = new Hotel({
+    name,
+    name_en,
+    address,
+    starRating,
+    roomTypes,
+    price,
+    openingTime,
+    description,
+    amenities,
+    createdBy: req.user._id,
+    status: req.user.role === 'admin' ? 'approved' : 'pending'
+  });
+
+  // 如果提供了经纬度信息，则设置地理位置
+  if (longitude !== undefined && latitude !== undefined) {
+    hotel.location = {
+      type: 'Point',
+      coordinates: [parseFloat(longitude), parseFloat(latitude)]
+    };
+  }
 
     await hotel.save();
     
@@ -59,11 +70,19 @@ export const getHotels = async (req, res) => {
       query.status = status;
     }
 
-    const hotels = await Hotel.find(query)
-      .select('-createdBy')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
+    // 推荐排序：按用户平均评分降序，没有评分的按星级降序，然后按创建时间降序
+    const hotels = await Hotel.aggregate([
+      { $match: query },
+      { $addFields: {
+          hasRating: { $cond: { if: { $ne: ["$averageRating", null] }, then: 1, else: 0 } }
+        } },
+      { $sort: { hasRating: -1, averageRating: -1, starRating: -1, createdAt: -1 } },
+      { $project: {
+          createdBy: 0
+        } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+    ]);
 
     const total = await Hotel.countDocuments(query);
 
@@ -106,33 +125,46 @@ export const updateHotel = async (req, res) => {
     }
 
     const {
-      name,
-      name_en,
-      address,
-      starRating,
-      roomTypes,
-      price,
-      openingTime,
-      description,
-      amenities
-    } = req.body;
+    name,
+    name_en,
+    address,
+    starRating,
+    roomTypes,
+    price,
+    openingTime,
+    description,
+    amenities,
+    longitude,
+    latitude
+  } = req.body;
 
-    const hotel = await Hotel.findOneAndUpdate(
-      { _id: req.params.id, createdBy: req.user._id },
-      {
-        name,
-        name_en,
-        address,
-        starRating,
-        roomTypes,
-        price,
-        openingTime,
-        description,
-        amenities,
-        status: 'pending' // 重置为待审核状态
-      },
-      { new: true, runValidators: true }
-    ).select('-createdBy');
+  // 构建更新对象
+  const updateData = {
+    name,
+    name_en,
+    address,
+    starRating,
+    roomTypes,
+    price,
+    openingTime,
+    description,
+    amenities,
+    status: 'pending' // 重置为待审核状态
+  };
+
+  // 如果提供了经纬度信息，则添加到更新对象
+  if (longitude !== undefined && latitude !== undefined) {
+    updateData.location = {
+      type: 'Point',
+      coordinates: [parseFloat(longitude), parseFloat(latitude)]
+    };
+  }
+
+  const hotel = await Hotel.findOneAndUpdate(
+    { _id: req.params.id, createdBy: req.user._id },
+    updateData,
+    { new: true, runValidators: true }
+  ).select('-createdBy');
 
     if (!hotel) {
       return res.status(404).json({ message: 'Hotel not found' });

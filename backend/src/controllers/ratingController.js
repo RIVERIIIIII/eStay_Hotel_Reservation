@@ -8,10 +8,10 @@ export const createOrUpdateRating = async (req, res) => {
     const { rating, comment } = req.body;
     const userId = req.user._id;
     
-    // 验证酒店是否存在且已审核通过
+    // 验证酒店是否存在且已审核通过或已发布
     const hotel = await Hotel.findOne({ 
       _id: hotelId, 
-      status: 'approved' 
+      status: { $in: ['approved', 'published'] } 
     });
     
     if (!hotel) {
@@ -110,15 +110,15 @@ export const deleteRating = async (req, res) => {
     const { ratingId } = req.params;
     const userId = req.user._id;
     
-    // 查找评分并验证是否属于该用户
-    const rating = await Rating.findOne({ _id: ratingId, userId });
+    // 使用findOneAndDelete()方法删除评分，这样中间件会被触发
+    const deletedRating = await Rating.findOneAndDelete({ _id: ratingId, userId });
     
-    if (!rating) {
+    if (!deletedRating) {
       return res.status(404).json({ message: 'Rating not found' });
     }
     
-    // 删除评分
-    await rating.deleteOne();
+    // 由于findOneAndDelete()会触发post('findOneAndDelete')中间件，
+    // 所以不需要手动更新酒店平均评分
     
     res.json({ message: 'Rating deleted successfully' });
   } catch (error) {
