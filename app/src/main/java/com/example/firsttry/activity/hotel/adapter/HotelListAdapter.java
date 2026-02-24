@@ -74,14 +74,13 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
             tvName.setText(hotel.getName());
             
             // Rating (Format to 1 decimal place, high contrast badge)
-            // 强校验逻辑：如果评分 <= 0，强制显示 4.8 预览，方便调试
             float rating = hotel.getAverageRating();
-            if (rating <= 0) {
-                rating = 4.8f; // Fallback for debugging/mock
-            }
-            
             tvRatingBadge.setVisibility(View.VISIBLE);
-            tvRatingBadge.setText(String.format("%.1f", rating));
+            if (rating <= 0) {
+                tvRatingBadge.setText("暂无评分");
+            } else {
+                tvRatingBadge.setText(String.format("%.1f", rating));
+            }
             
             // Distance logic
             if (hotel.getDistanceKm() > 0) {

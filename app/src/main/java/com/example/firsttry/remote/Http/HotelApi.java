@@ -422,16 +422,13 @@ public class HotelApi {
             // 如果是城市模式(isLocationMode=false)，则显示"距离市中心" -> isCityCenter=true
             boolean isCityCenter = !isLocationMode;
 
-            // 从服务器获取真实评分数据，如果没有评分则设为0
+            // 从服务器获取真实评分数据
             float averageRating = 0.0f;
-            if (hotelJson.has("averageRating")) {
-                try {
-                    if (!hotelJson.get("averageRating").isJsonNull()) {
-                        averageRating = hotelJson.get("averageRating").getAsFloat();
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "解析评分数据失败: " + e.getMessage());
-                }
+            if (hotelJson.has("averageRating") && !hotelJson.get("averageRating").isJsonNull()) {
+                averageRating = hotelJson.get("averageRating").getAsFloat();
+            } else if (hotelJson.has("rating") && !hotelJson.get("rating").isJsonNull()) {
+                // 兼容 rating 字段
+                averageRating = hotelJson.get("rating").getAsFloat();
             }
             
             return new HotelModel(id, name, nameEn, address, starRating, roomTypes, startPrice, openingTime, description, amenities, images, thumbnailUrl, tags, distanceKm, isCityCenter, averageRating);

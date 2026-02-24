@@ -108,7 +108,7 @@ public class HotelListActivity extends AppCompatActivity {
     }
 
     private void showSortPopup(View anchor) {
-        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "评分优先"};
+        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "评分优先", "距离最近"};
         android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
         listPopupWindow.setAnchorView(anchor);
         listPopupWindow.setAdapter(new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sortOptions));
@@ -128,6 +128,9 @@ public class HotelListActivity extends AppCompatActivity {
                 case 3: // Rating
                     searchQuery.setSortBy("rating"); // Backend expects "rating" for rating sort
                     break;
+                case 4: // Distance
+                    searchQuery.setSortBy("distance_asc"); // Backend expects "distance_asc" for distance sort
+                    break;  
                 case 0: // Recommended (Default)
                 default:
                     searchQuery.setSortBy(null);
@@ -366,6 +369,8 @@ public class HotelListActivity extends AppCompatActivity {
             // Check City Change
             if (!tempCity.equals(searchQuery.getCity())) {
                 searchQuery.setCity(tempCity);
+                //手动修改城市时，关闭定位模式
+                searchQuery.setLocationMode(false);
                 changed = true;
             }
             
@@ -399,6 +404,11 @@ public class HotelListActivity extends AppCompatActivity {
             @Override
             public void onLocationSuccess(double latitude, double longitude, String cityName) {
                 tempCity = cityName;
+                //设置定位模式和经纬度
+                searchQuery.setLocationMode(true);
+                searchQuery.setLatitude(latitude);
+                searchQuery.setLongitude(longitude);
+                //更新UI
                 tvTopSheetCity.setText("当前城市: " + cityName);
                 tvLocationStatus.setText("已定位: " + cityName);
                 Toast.makeText(HotelListActivity.this, "定位成功", Toast.LENGTH_SHORT).show();
@@ -434,6 +444,8 @@ public class HotelListActivity extends AppCompatActivity {
                 // Update temp state, not main query yet
                 tempCity = city;
                 tvTopSheetCity.setText("当前城市: " + city);
+                // 手动选择城市时，关闭定位模式
+                searchQuery.setLocationMode(false);
             }
         }
     }
