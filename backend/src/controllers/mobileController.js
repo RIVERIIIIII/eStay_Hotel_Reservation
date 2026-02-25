@@ -461,10 +461,13 @@ export const getMobileHotels = async (req, res) => {
       const checkOut = new Date(checkOutDate);
       
       if (!isNaN(checkIn.getTime()) && !isNaN(checkOut.getTime())) {
-        // 过滤出有可用房间的酒店
-        hotels = hotels.filter(hotel => {
-          // 检查酒店是否有至少一个可用房型
-          return hotel.roomTypes.some(roomType => {
+        // 过滤出有可用房间的酒店，并为每个酒店只保留可用的房型
+        hotels = hotels.map(hotel => {
+          // 将 Mongoose 文档转换为普通对象，确保可以修改
+          let hotelObj = hotel.toObject ? hotel.toObject() : hotel;
+          
+          // 过滤出酒店的可用房型
+          const availableRoomTypes = hotelObj.roomTypes.filter(roomType => {
             // 如果房间未被占用或占用时间与查询时间不冲突，则可用
             if (!roomType.occupied) {
               return true;
@@ -473,19 +476,18 @@ export const getMobileHotels = async (req, res) => {
             const occupiedCheckIn = new Date(roomType.occupied.checkInDate);
             const occupiedCheckOut = new Date(roomType.occupied.checkOutDate);
             
-            // 检查时间冲突 - 只判断是否与当前占用的时间段重叠
-            // 如果请求的入住时间在已占用的时间段内，或者请求的退房时间在已占用的时间段内，
-            // 或者请求的时间段完全包含已占用的时间段，或者已占用的时间段完全包含请求的时间段
-            // 注意：如果已占用的时间段已经过期，这里的比较会自动处理，因为已过期的时间段不会与未来的查询时间冲突
-            const hasConflict = (
-              (checkIn >= occupiedCheckIn && checkIn < occupiedCheckOut) ||
-              (checkOut > occupiedCheckIn && checkOut <= occupiedCheckOut) ||
-              (checkIn <= occupiedCheckIn && checkOut >= occupiedCheckOut)
-            );
+            // 检查时间冲突
+            // 冲突条件：如果查询时间段与占用时间段有任何重叠，则视为冲突
+            // 使用包含边界的比较，确保完全重叠的时间段也能被正确检测
+            const hasConflict = !(checkOut <= occupiedCheckIn || checkIn >= occupiedCheckOut);
             
             return !hasConflict;
           });
-        });
+          
+          // 更新酒店的房型列表，只保留可用的房型
+          hotelObj.roomTypes = availableRoomTypes;
+          return hotelObj;
+        }).filter(hotel => hotel.roomTypes.length > 0); // 只保留有可用房型的酒店
       }
     }
 
@@ -520,7 +522,7 @@ export const getMobileHotels = async (req, res) => {
 export const getFeaturedHotels = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 3;
-    const { city, latitude, longitude } = req.query;
+    const { city, latitude, longitude, checkInDate, checkOutDate } = req.query;
     
     // 查询所有已发布的酒店
     const hotels = await Hotel.find({ status: 'published' })
@@ -555,6 +557,39 @@ export const getFeaturedHotels = async (req, res) => {
       featured = featured.map(hotel => hotel.toObject());
     }
     
+    // 检查房间可用性（如果提供了入住和退宿时间）
+    if (checkInDate && checkOutDate) {
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+      
+      if (!isNaN(checkIn.getTime()) && !isNaN(checkOut.getTime())) {
+        // 过滤出有可用房间的酒店，并为每个酒店只保留可用的房型
+        featured = featured.map(hotel => {
+          // 过滤出酒店的可用房型
+          const availableRoomTypes = hotel.roomTypes.filter(roomType => {
+            // 如果房间未被占用或占用时间与查询时间不冲突，则可用
+            if (!roomType.occupied) {
+              return true;
+            }
+            
+            const occupiedCheckIn = new Date(roomType.occupied.checkInDate);
+            const occupiedCheckOut = new Date(roomType.occupied.checkOutDate);
+            
+            // 检查时间冲突
+            // 冲突条件：如果查询时间段与占用时间段有任何重叠，则视为冲突
+            // 使用包含边界的比较，确保完全重叠的时间段也能被正确检测
+            const hasConflict = !(checkOut <= occupiedCheckIn || checkIn >= occupiedCheckOut);
+            
+            return !hasConflict;
+          });
+          
+          // 更新酒店的房型列表，只保留可用的房型
+          hotel.roomTypes = availableRoomTypes;
+          return hotel;
+        }).filter(hotel => hotel.roomTypes.length > 0); // 只保留有可用房型的酒店
+      }
+    }
+    
     res.json({ hotels: featured });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -581,7 +616,7 @@ export const getMobileHotelById = async (req, res) => {
     hotelObj.reviewCount = hotelObj.ratingCount;
 
     // 如果有城市或经纬度参数，计算距离
-    const { city, latitude, longitude } = req.query;
+    const { city, latitude, longitude, checkInDate, checkOutDate } = req.query;
     const basePoint = getBasePoint(city, null, latitude, longitude);
     if (basePoint && hotelObj.location && hotelObj.location.coordinates && 
         hotelObj.location.coordinates[0] !== 0 && hotelObj.location.coordinates[1] !== 0) {
@@ -590,6 +625,35 @@ export const getMobileHotelById = async (req, res) => {
         hotelObj.location.coordinates[1], hotelObj.location.coordinates[0]  // 酒店坐标 [longitude, latitude]
       );
       hotelObj.distance = distance;
+    }
+
+    // 检查房间可用性（如果提供了入住和退宿时间）
+    if (checkInDate && checkOutDate) {
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+      
+      if (!isNaN(checkIn.getTime()) && !isNaN(checkOut.getTime())) {
+        // 过滤出酒店的可用房型
+        const availableRoomTypes = hotelObj.roomTypes.filter(roomType => {
+          // 如果房间未被占用或占用时间与查询时间不冲突，则可用
+          if (!roomType.occupied) {
+            return true;
+          }
+          
+          const occupiedCheckIn = new Date(roomType.occupied.checkInDate);
+          const occupiedCheckOut = new Date(roomType.occupied.checkOutDate);
+          
+          // 检查时间冲突
+          // 冲突条件：如果查询时间段与占用时间段有任何重叠，则视为冲突
+          // 使用包含边界的比较，确保完全重叠的时间段也能被正确检测
+          const hasConflict = !(checkOut <= occupiedCheckIn || checkIn >= occupiedCheckOut);
+          
+          return !hasConflict;
+        });
+        
+        // 更新酒店的房型列表，只保留可用的房型
+        hotelObj.roomTypes = availableRoomTypes;
+      }
     }
 
     res.json({ hotel: hotelObj });

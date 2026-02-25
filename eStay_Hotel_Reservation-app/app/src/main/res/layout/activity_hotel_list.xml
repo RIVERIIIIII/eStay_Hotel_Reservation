@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_main"
+    android:fitsSystemWindows="true">
+
+    <!-- Main Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Header: [Triangle] [Location] [Date] [Search] -->
+        <!-- Background: Beige, Text: Dark Brown -->
+        <RelativeLayout
+            android:id="@+id/ll_header"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@color/background_main"
+            android:paddingHorizontal="16dp"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- Left: Triangle + City -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_arrow_drop_down"
+                    app:tint="@color/text_primary"
+                    android:contentDescription="Dropdown"/>
+
+                <TextView
+                    android:id="@+id/tv_header_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="北京"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+
+            <!-- Center: Date -->
+            <TextView
+                android:id="@+id/tv_header_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="05-01 - 05-02"
+                android:textSize="14sp"
+                android:textColor="@color/text_primary"/>
+
+            <!-- Right: Search -->
+            <ImageView
+                android:id="@+id/iv_header_search"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/serach"
+                app:tint="@color/text_primary"
+                android:contentDescription="Search"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+        <!-- Sub-Filter Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/white"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="16dp"
+            android:elevation="2dp">
+
+            <TextView
+                android:id="@+id/tv_sort"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="推荐排序 ▼"
+                android:gravity="center"
+                android:textColor="@color/text_primary"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/divider_color"/>
+
+            <TextView
+                android:id="@+id/tv_filter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="筛选 ▼"
+                android:gravity="center"
+                android:textColor="@color/text_primary"/>
+
+        </LinearLayout>
+
+        <!-- Quick Filter Tags -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_quick_filters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_main"
+            android:paddingVertical="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clipToPadding="false"
+            android:elevation="2dp" />
+
+        <!-- Hotel List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_hotel_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:clipToPadding="false"/>
+
+    </LinearLayout>
+
+    <!-- Top Sheet Overlay -->
+    <!-- Ensure elevation is high enough -->
+    <FrameLayout
+        android:id="@+id/fl_top_sheet_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="10dp">
+
+        <LinearLayout
+            android:id="@+id/ll_top_sheet_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:padding="16dp"
+            android:elevation="8dp">
+
+            <!-- City Selection -->
+            <LinearLayout
+                android:id="@+id/ll_reselect_city"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
+                
+                <TextView
+                    android:id="@+id/tv_top_sheet_city"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="当前城市: 北京"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"/>
+                
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/right_arrow"
+                    android:contentDescription="Arrow Right"/>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_color"/>
+
+            <!-- Location Feature -->
+            <LinearLayout
+                android:id="@+id/ll_relocate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/tv_location_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="定位为当前位置"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_location_on"
+                    app:tint="@color/app_primary_brown"
+                    android:contentDescription="Location"/>
+            </LinearLayout>
+            
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_color"/>
+
+            <!-- Search Box -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical">
+                
+                <EditText
+                    android:id="@+id/et_top_sheet_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_search_earth_tone"
+                    android:hint="搜索酒店/地名/关键词"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"
+                    android:paddingHorizontal="12dp"
+                    android:drawableStart="@drawable/serach"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/app_primary_brown"
+                    android:singleLine="true"
+                    android:imeOptions="actionDone"/>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_color"/>
+
+            <!-- Date Selection -->
+             <LinearLayout
+                android:id="@+id/ll_date_selection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="12dp"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/tv_top_sheet_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="05-01 至 05-02"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/history"
+                    app:tint="@color/app_primary_brown"
+                    android:contentDescription="Date"/>
+            </LinearLayout>
+
+            <!-- Bottom Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp">
+
+                <Button
+                    android:id="@+id/btn_top_sheet_reset"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="重置"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:textColor="@color/app_primary_brown"
+                    app:strokeColor="@color/app_primary_brown"
+                    app:cornerRadius="12dp"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_top_sheet_done"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="完成"
+                    android:backgroundTint="@color/app_primary_brown"
+                    android:textColor="@color/white"
+                    app:cornerRadius="12dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>

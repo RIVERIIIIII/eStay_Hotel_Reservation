@@ -88,8 +88,10 @@ io.on('connection', (socket) => {
   });
 });
 
-// 启动服务器
-server.listen(PORT, () => {
+// 启动服务器 - 监听所有网络接口
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is accessible at http://localhost:${PORT}`);
+  console.log(`Server is accessible at http://0.0.0.0:${PORT}`);
   console.log(`WebSocket server is running on ws://localhost:${PORT}`);
 });

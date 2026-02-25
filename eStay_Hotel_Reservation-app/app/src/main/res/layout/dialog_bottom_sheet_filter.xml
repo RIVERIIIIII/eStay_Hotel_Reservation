@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/background_content">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_price_range"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"/>
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/slider_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="0"
+        android:valueTo="1300"
+        android:stepSize="100"
+        android:layout_marginTop="8dp"
+        app:trackColorInactive="@color/text_secondary"
+        app:trackColorActive="@color/app_primary_brown"
+        app:thumbColor="@color/app_primary_brown"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_star_rating"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/rg_star_rating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <RadioButton
+            android:id="@+id/rb_star_2"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="@string/star_2_below"
+            android:button="@null"
+            android:gravity="center"
+            android:background="@drawable/bg_star_rating_selector"
+            android:textColor="@color/text_color_star_selector"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_star_3"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:text="@string/star_3"
+            android:button="@null"
+            android:gravity="center"
+            android:background="@drawable/bg_star_rating_selector"
+            android:textColor="@color/text_color_star_selector"
+            android:textSize="14sp"/>
+        
+        <RadioButton
+            android:id="@+id/rb_star_4"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:text="@string/star_4"
+            android:button="@null"
+            android:gravity="center"
+            android:background="@drawable/bg_star_rating_selector"
+            android:textColor="@color/text_color_star_selector"
+            android:textSize="14sp"/>
+
+        <RadioButton
+            android:id="@+id/rb_star_5"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="@string/star_5"
+            android:button="@null"
+            android:gravity="center"
+            android:background="@drawable/bg_star_rating_selector"
+            android:textColor="@color/text_color_star_selector"
+            android:textSize="14sp"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:paddingBottom="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_reset"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="@string/action_reset"
+            android:textColor="@color/app_primary_brown"
+            android:textSize="16sp"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/app_primary_brown"
+            app:strokeWidth="1dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_confirm"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="@string/action_done"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            app:backgroundTint="@color/app_primary_brown"
+            app:cornerRadius="12dp"/>
+    </LinearLayout>
+
+</LinearLayout>

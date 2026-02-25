@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/app_primary_blue" />   <!-- 你图里类似那种紫色按钮，可以按需要改颜色 -->
+    <corners android:radius="18dp" />
+</shape>
