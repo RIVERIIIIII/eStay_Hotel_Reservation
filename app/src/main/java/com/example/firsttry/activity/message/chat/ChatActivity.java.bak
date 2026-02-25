@@ -159,15 +159,6 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
         super.onResume();
         webSocketManager.addListener(this);
         setupHeader();
-        
-        // 连接WebSocket服务器
-        if (!TextUtils.isEmpty(currentUsername)) {
-            // 使用默认用户ID连接WebSocket
-            String currentUserId = webSocketManager.getDefaultUserId();
-            if (!TextUtils.isEmpty(currentUserId)) {
-                webSocketManager.connect(currentUserId);
-            }
-        }
     }
 
     @Override
@@ -256,10 +247,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
                 messageJson.put("writer", currentUsername);
                 messageJson.put("receiver", conversationPartnerName);
                 messageJson.put("createtime", formattedTime);
-                // 修复：使用正确的用户ID作为receiverId
-                // 这里使用lywn（酒店1的负责人）的ID
-                String conversationPartnerId = "698acb0ecfa6fad12150079f"; // lywn的有效用户ID
-                webSocketManager.sendMessage(token, conversationPartnerId, content);
+                webSocketManager.sendMessage(conversationPartnerName, content);
             } catch (JSONException e) {
                 Log.e("ChatActivity", "构造发送 JSON 失败", e);
             }
@@ -289,82 +277,22 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
     public void onWebSocketMessage(String text) {
         runOnUiThread(() -> {
             try {
-                Log.d("ChatActivity_WS", "收到WebSocket消息: " + text);
                 JSONObject root = new JSONObject(text);
-                
-                // 检查消息格式，可能是直接的消息对象，也可能是包含data字段的对象
-                JSONObject messageData;
-                if (root.has("data")) {
-                    Object dataNode = root.get("data");
-                    if (dataNode instanceof JSONObject) {
-                        messageData = (JSONObject) dataNode;
-                    } else if (dataNode instanceof JSONArray) {
-                        JSONArray dataArray = (JSONArray) dataNode;
-                        if (dataArray.length() > 0) {
-                            messageData = dataArray.getJSONObject(0);
-                        } else {
-                            return;
-                        }
-                    } else {
-                        return;
-                    }
-                } else {
-                    // 如果没有data字段，直接使用root作为消息对象
-                    messageData = root;
+                if (!root.has("data")) return;
+                Object dataNode = root.get("data");
+                JSONObject data = null;
+                if (dataNode instanceof JSONObject) data = (JSONObject) dataNode;
+                else if (dataNode instanceof JSONArray) {
+                    JSONArray dataArray = (JSONArray) dataNode;
+                    if (dataArray.length() > 0) data = dataArray.getJSONObject(0);
                 }
-                
-                Log.d("ChatActivity_WS", "解析后的消息对象: " + messageData.toString());
-                
-                // 提取必要的字段
-                String content = messageData.optString("content");
-                String time = messageData.optString("createdAt", messageData.optString("createtime"));
-                
-                // 获取发送者信息
-                String senderId = messageData.optString("senderIdStr", messageData.optString("senderId"));
-                String receiverId = messageData.optString("receiverIdStr", messageData.optString("receiverId"));
-                
-                // 获取发送者名称（可能在senderId对象中）
-                String senderName;
-                if (messageData.has("senderId") && messageData.get("senderId") instanceof JSONObject) {
-                    JSONObject senderObj = messageData.getJSONObject("senderId");
-                    senderName = senderObj.optString("username");
-                } else {
-                    // 如果没有用户名信息，使用conversationPartnerName
-                    senderName = conversationPartnerName;
-                }
-                
-                // 检查是否是当前会话的消息
-                // 如果是酒店会话，直接处理
-                if (!TextUtils.isEmpty(hotelName)) {
-                    // 酒店会话，直接显示消息
-                    ChatMessage receivedMsg = new ChatMessage(
-                            String.valueOf(System.currentTimeMillis()),
-                            conversationPartnerName,
-                            senderName,  // 使用发送者名称
-                            currentUsername,  // 当前用户作为接收者
-                            content,
-                            time,
-                            false  // 不是我发送的
-                    );
+                if (data == null) return;
+                String sender = data.optString("writer");
+                String receiver = data.optString("receiver");
+                boolean isRelated = (sender.equals(conversationPartnerName) && receiver.equals(currentUsername));
+                if (isRelated) {
+                    ChatMessage receivedMsg = new ChatMessage(String.valueOf(System.currentTimeMillis()), conversationPartnerName, sender, receiver, data.optString("content"), data.optString("createtime"), false);
                     handleNewMessage(receivedMsg);
-                } else {
-                    // 普通用户会话，检查是否是当前会话的消息
-                    // 由于我们没有正确的用户ID映射，暂时使用用户名进行比较
-                    boolean isRelated = senderName.equals(conversationPartnerName) || 
-                                      senderId.equals("698acb0ecfa6fad12150079f"); // lywn的ID
-                    
-                    if (isRelated) {
-                        ChatMessage receivedMsg = new ChatMessage(
-                                String.valueOf(System.currentTimeMillis()),
-                                conversationPartnerName,
-                                senderName,
-                                currentUsername,
-                                content,
-                                time,
-                                false
-                        );
-                        handleNewMessage(receivedMsg);
-                    }
                 }
             } catch (JSONException e) {
                 Log.e("ChatActivity_WS", "解析JSON失败", e);

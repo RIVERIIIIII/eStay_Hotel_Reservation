@@ -164,8 +164,8 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private void loadHotelDetail(String hotelId) {
         Toast.makeText(this, "正在加载酒店详情...", Toast.LENGTH_SHORT).show();
-         /*com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, checkInDate, checkOutDate, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {*/
-         com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {
+         com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, checkInDate, checkOutDate, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {
+         /*com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {*/
             @Override
             public void onSuccess(HotelModel hotel) {
                 runOnUiThread(() -> {
@@ -298,12 +298,12 @@ public class HotelDetailActivity extends AppCompatActivity {
             this.checkOutDate = endDate;
             this.totalNights = nights;
             updateDateDisplay();
-            refreshRoomPrices();
+            /*refreshRoomPrices();*/
             // 重新加载酒店详情，获取最新的可用房型
-            /*String hotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
+            String hotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
             if (hotelId != null) {
             loadHotelDetail(hotelId);
-            }*/
+            }
         });
         dialog.show(getSupportFragmentManager(), "CalendarDialog");
     }
