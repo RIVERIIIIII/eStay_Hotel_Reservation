@@ -106,13 +106,10 @@ public class HotelListActivity extends AppCompatActivity {
     private void setupSubFilter() {
         TextView tvSort = findViewById(R.id.tv_sort);
         tvSort.setOnClickListener(v -> showSortPopup(v));
-
-        TextView tvFilter = findViewById(R.id.tv_filter);
-        tvFilter.setOnClickListener(v -> showFilterPopup(v));
     }
 
     private void showSortPopup(View anchor) {
-        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "评分优先", "距离最近"};
+        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "距离最近"};
         android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
         listPopupWindow.setAnchorView(anchor);
         listPopupWindow.setAdapter(new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sortOptions));
@@ -129,10 +126,7 @@ public class HotelListActivity extends AppCompatActivity {
                 case 2: // Price High -> Low
                     searchQuery.setSortBy("price_desc");
                     break;
-                case 3: // Rating
-                    searchQuery.setSortBy("rating"); // Backend expects "rating" for rating sort
-                    break;
-                case 4: // Distance
+                case 3: // Distance
                     searchQuery.setSortBy("distance_asc"); // Backend expects "distance_asc" for distance sort
                     break;  
                 case 0: // Recommended (Default)

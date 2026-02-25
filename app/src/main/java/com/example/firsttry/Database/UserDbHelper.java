@@ -128,13 +128,23 @@ public class UserDbHelper extends SQLiteOpenHelper {
     public void upsertConversationMessage(Message msg) {
         String convId = msg.getSenderName();
         if (convId == null || convId.isEmpty()) return;
+        
         ContentValues values = new ContentValues();
-        values.put(COL_CONV_ID, convId);
-        values.put(COL_SENDER, msg.getSenderName());
         values.put(COL_CONTENT, msg.getContent());
         values.put(COL_TIME, msg.getTime());
         values.put(COL_UNREAD, msg.getUnreadCount());
-        database.insertWithOnConflict(TABLE_CONVERSATIONS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        if (msg.getRemark() != null) {
+            values.put(COL_REMARK, msg.getRemark());
+        }
+
+        // 尝试更新，如果更新失败（返回0），则插入
+        int rows = database.update(TABLE_CONVERSATIONS, values, COL_CONV_ID + " = ?", new String[]{convId});
+        
+        if (rows == 0) {
+            values.put(COL_CONV_ID, convId);
+            values.put(COL_SENDER, msg.getSenderName());
+            database.insert(TABLE_CONVERSATIONS, null, values);
+        }
     }
 
     public List<Message> loadAllConversations() {

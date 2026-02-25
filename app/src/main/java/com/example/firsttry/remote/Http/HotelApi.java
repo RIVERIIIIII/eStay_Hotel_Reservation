@@ -214,23 +214,20 @@ public class HotelApi {
     }
 
     // 获取酒店详情
-    public static void getHotelDetail(String hotelId, String checkInDate, String checkoutDate, HotelDetailCallback callback) {
+    public static void getHotelDetail(String hotelId, String checkInDate, String checkOutDate, HotelDetailCallback callback) {
         String url = HttpClient.BASE_URL + "api/public/hotels/" + hotelId;
+        
         // 构建URL参数
         okhttp3.HttpUrl.Builder urlBuilder = okhttp3.HttpUrl.parse(url).newBuilder();
         if (checkInDate != null) urlBuilder.addQueryParameter("checkInDate", checkInDate);
-        if (checkoutDate != null) urlBuilder.addQueryParameter("checkoutDate", checkoutDate);
-
+        if (checkOutDate != null) urlBuilder.addQueryParameter("checkOutDate", checkOutDate);
+        
         String finalUrl = urlBuilder.build().toString();
         Log.d(TAG, "GET: " + finalUrl);
-        /*Log.d(TAG, "GET:" + url);*/
 
         Request request = new Request.Builder()
                 .url(finalUrl)
                 .build();
-        /*Request request = new Request.Builder()
-                .url(url)
-                .build();*/
 
         client.newCall(request).enqueue(new Callback() {
             @Override

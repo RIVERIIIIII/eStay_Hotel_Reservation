@@ -154,7 +154,19 @@ public class HotelSearchFragment extends Fragment {
         tvCheckInDate = view.findViewById(R.id.tv_check_in_date);
         tvCheckOutDate = view.findViewById(R.id.tv_check_out_date);
         tvTotalNights = view.findViewById(R.id.tv_total_nights);
-        tvFilterTrigger = view.findViewById(R.id.tv_filter_trigger);
+        tvFilterTrigger = view.findViewById(R.id.tv_sort); // Corrected ID: layout_filter contains tv_sort
+        // 修正：确保 tvFilterTrigger 能被找到，如果 XML 中没有 tv_sort，需要使用正确的 ID
+        if (tvFilterTrigger == null) {
+             // 尝试查找 layout_filter 作为触发器
+             View layoutFilter = view.findViewById(R.id.layout_filter);
+             if (layoutFilter instanceof TextView) {
+                 tvFilterTrigger = (TextView) layoutFilter;
+             } else if (layoutFilter != null) {
+                 // 如果 layout_filter 是 LinearLayout，我们需要找到其中的 TextView 或者直接给 layout 设置点击事件
+                 // 这里为了兼容现有代码结构，尽量找到 TextView
+                 tvFilterTrigger = view.findViewById(R.id.tv_sort);
+             }
+        }
         tvRoomGuestInfo = view.findViewById(R.id.tv_room_guest_info);
         etKeyword = view.findViewById(R.id.et_keyword);
         rvQuickTags = view.findViewById(R.id.rv_quick_tags);
@@ -163,23 +175,26 @@ public class HotelSearchFragment extends Fragment {
         vpBanner = view.findViewById(R.id.vp_banner);
 
         // 增加判空保护
-        if (tvCity == null || tvCheckInDate == null || btnSearch == null) {
+        if (tvCity == null || tvCheckInDate == null || btnSearch == null || vpBanner == null) {
             Log.e("HotelSearchFragment", "Critical views not found!");
             Toast.makeText(getContext(), "页面初始化异常", Toast.LENGTH_SHORT).show();
-            return;
+            // 避免崩溃，但功能可能受限
+            return; 
         }
 
         // Set default text
-        tvCheckInDate.setText(searchQuery.getCheckInDate());
-        tvCheckOutDate.setText(searchQuery.getCheckOutDate());
-        tvTotalNights.setText("共 1 晚");
+        if (tvCheckInDate != null) tvCheckInDate.setText(searchQuery.getCheckInDate());
+        if (tvCheckOutDate != null) tvCheckOutDate.setText(searchQuery.getCheckOutDate());
+        if (tvTotalNights != null) tvTotalNights.setText("共 1 晚");
         updateRoomGuestText();
 
         // City click listener
-        tvCity.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), CityPickerActivity.class);
-            cityPickerLauncher.launch(intent);
-        });
+        if (tvCity != null) {
+            tvCity.setOnClickListener(v -> {
+                Intent intent = new Intent(getContext(), CityPickerActivity.class);
+                cityPickerLauncher.launch(intent);
+            });
+        }
     }
 
     private void updateRoomGuestText() {
@@ -405,18 +420,27 @@ public class HotelSearchFragment extends Fragment {
     }
 
     private void setupFilter(View view) {
-        tvFilterTrigger.setOnClickListener(v -> {
-            FilterBottomSheetDialogFragment bottomSheet = new FilterBottomSheetDialogFragment();
-            bottomSheet.setOnFilterAppliedListener((minPrice, maxPrice, starRating) -> {
-                searchQuery.setMinPrice(minPrice);
-                searchQuery.setMaxPrice(maxPrice);
-                searchQuery.setStarRating(starRating);
+        View filterClickTarget = tvFilterTrigger;
+        if (filterClickTarget == null) {
+            filterClickTarget = view.findViewById(R.id.layout_filter);
+        }
+        
+        if (filterClickTarget != null) {
+            filterClickTarget.setOnClickListener(v -> {
+                FilterBottomSheetDialogFragment bottomSheet = new FilterBottomSheetDialogFragment();
+                bottomSheet.setOnFilterAppliedListener((minPrice, maxPrice, starRating) -> {
+                    searchQuery.setMinPrice(minPrice);
+                    searchQuery.setMaxPrice(maxPrice);
+                    searchQuery.setStarRating(starRating);
 
-                String starText = starRating == 0 ? "不限" : starRating + "星";
-                tvFilterTrigger.setText("价格: ¥" + minPrice + "-" + maxPrice + ", 星级: " + starText);
+                    if (tvFilterTrigger != null) {
+                        String starText = starRating == 0 ? "不限" : starRating + "星";
+                        tvFilterTrigger.setText("价格: ¥" + minPrice + "-" + maxPrice + ", 星级: " + starText);
+                    }
+                });
+                bottomSheet.show(getChildFragmentManager(), "FilterBottomSheet");
             });
-            bottomSheet.show(getChildFragmentManager(), "FilterBottomSheet");
-        });
+        }
     }
 
     private void setupQuickTags() {
