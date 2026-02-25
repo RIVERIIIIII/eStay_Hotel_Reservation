@@ -24,17 +24,6 @@
         app:singleSelection="false">
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_free_parking"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="免费停车"
-            android:textColor="@color/text_primary"
-            app:chipBackgroundColor="@color/white"
-            app:chipStrokeColor="@color/text_secondary"
-            app:chipStrokeWidth="1dp"/>
-
-        <com.google.android.material.chip.Chip
             android:id="@+id/chip_gym"
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
@@ -66,13 +55,35 @@
             app:chipBackgroundColor="@color/white"
             app:chipStrokeColor="@color/text_secondary"
             app:chipStrokeWidth="1dp"/>
-            
+
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_breakfast"
+            android:id="@+id/chip_free_parking"
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="含早"
+            android:text="免费停车"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_luggage"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="行李寄存"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_24h_front_desk"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="24小时前台"
             android:textColor="@color/text_primary"
             app:chipBackgroundColor="@color/white"
             app:chipStrokeColor="@color/text_secondary"

@@ -12,9 +12,12 @@ import com.example.firsttry.R;
 
 import java.util.List;
 
+import com.bumptech.glide.Glide;
+
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
 
-    private final List<Integer> images;
+    private List<Integer> images; // Local resources
+    private List<com.example.firsttry.activity.hotel.model.HotelModel> hotels; // Remote data
     private OnBannerClickListener listener;
 
     public interface OnBannerClickListener {
@@ -23,6 +26,10 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     public BannerAdapter(List<Integer> images) {
         this.images = images;
+    }
+
+    public BannerAdapter(List<com.example.firsttry.activity.hotel.model.HotelModel> hotels, boolean isRemote) {
+        this.hotels = hotels;
     }
 
     public void setOnBannerClickListener(OnBannerClickListener listener) {
@@ -38,19 +45,46 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
-        holder.imageView.setImageResource(images.get(position));
-        if (listener != null) {
-            holder.itemView.setOnClickListener(v -> listener.onBannerClick(position));
-            holder.itemView.setClickable(true);
-        } else {
-            holder.itemView.setOnClickListener(null);
-            holder.itemView.setClickable(false);
+        if (hotels != null && !hotels.isEmpty()) {
+            // Load remote image
+            com.example.firsttry.activity.hotel.model.HotelModel hotel = hotels.get(position);
+            
+            // 使用 Glide 加载网络图片
+            String imageUrl = hotel.getThumbnailUrl();
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .placeholder(R.drawable.splash_image) // 加载中显示的占位图
+                        .error(R.drawable.splash_image) // 加载失败显示的图片
+                        .centerCrop()
+                        .into(holder.imageView);
+            } else {
+                holder.imageView.setImageResource(R.drawable.splash_image);
+            }
+            
+            // Set click listener with real hotel ID
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onBannerClick(position);
+                }
+            });
+        } else if (images != null && !images.isEmpty()) {
+            // Load local resource
+            holder.imageView.setImageResource(images.get(position));
+            
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onBannerClick(position);
+                }
+            });
         }
     }
 
     @Override
     public int getItemCount() {
-        return images.size();
+        if (hotels != null) return hotels.size();
+        if (images != null) return images.size();
+        return 0;
     }
 
     static class BannerViewHolder extends RecyclerView.ViewHolder {

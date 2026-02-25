@@ -73,6 +73,10 @@ public class HotelListActivity extends AppCompatActivity {
 
     private boolean isTopSheetVisible = false;
 
+    public HotelSearchQuery getSearchQuery() {
+        return searchQuery;
+    }
+    
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

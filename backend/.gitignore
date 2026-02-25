@@ -1,6 +1,7 @@
 # 忽略不需要的文件夹和文件
 ../PC/
 ../eStay_Hotel_Reservation-app-debug/
+../eStay_Hotel_Reservation-app/
 ../frontend/
 ../.gradle/
 

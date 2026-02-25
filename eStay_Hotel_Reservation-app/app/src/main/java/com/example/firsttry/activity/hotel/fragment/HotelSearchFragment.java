@@ -31,6 +31,7 @@ import com.example.firsttry.activity.hotel.adapter.BannerAdapter;
 import com.example.firsttry.activity.hotel.adapter.QuickFilterAdapter;
 import com.example.firsttry.activity.hotel.dialog.CalendarDialogFragment;
 import com.example.firsttry.activity.hotel.dialog.FilterBottomSheetDialogFragment;
+import com.example.firsttry.activity.hotel.model.HotelModel;
 import com.example.firsttry.activity.hotel.model.HotelSearchQuery;
 import com.example.firsttry.utils.LocationUtils;
 import com.example.firsttry.utils.TimeProvider;
@@ -52,6 +53,7 @@ public class HotelSearchFragment extends Fragment {
     private TextView tvCheckOutDate;
     private TextView tvTotalNights;
     private TextView tvFilterTrigger;
+    private TextView tvLogout; // New Logout Button
     private TextView tvRoomGuestInfo;
     private EditText etKeyword;
     private RecyclerView rvQuickTags;
@@ -157,6 +159,7 @@ public class HotelSearchFragment extends Fragment {
         etKeyword = view.findViewById(R.id.et_keyword);
         rvQuickTags = view.findViewById(R.id.rv_quick_tags);
         btnSearch = view.findViewById(R.id.btn_search);
+        tvLogout = view.findViewById(R.id.tv_logout);
         vpBanner = view.findViewById(R.id.vp_banner);
 
         // 增加判空保护
@@ -187,20 +190,44 @@ public class HotelSearchFragment extends Fragment {
     }
 
     private void setupBanner() {
-        // Mock data: reusing existing drawable resources
-        List<Integer> images = Arrays.asList(
-                R.drawable.splash_image, // Placeholder 1
-                R.drawable.splash_image, // Placeholder 2
-                R.drawable.splash_image  // Placeholder 3
-        );
-        BannerAdapter adapter = new BannerAdapter(images);
-        adapter.setOnBannerClickListener(position -> {
-            // Click to navigate to Hotel Detail
-            Intent intent = new Intent(getContext(), HotelDetailActivity.class);
-            intent.putExtra(HotelDetailActivity.EXTRA_HOTEL_ID, "banner_hotel_" + position);
-            startActivity(intent);
+        // Fetch featured hotels from backend
+        com.example.firsttry.remote.Http.HotelApi.getFeaturedHotels(new com.example.firsttry.remote.Http.HotelApi.FeaturedHotelsCallback() {
+            @Override
+            public void onSuccess(java.util.List<HotelModel> hotels) {
+                if (getActivity() == null) return;
+                
+                getActivity().runOnUiThread(() -> {
+                    // Update Banner with real data
+                    if (hotels != null && !hotels.isEmpty()) {
+                        com.example.firsttry.activity.hotel.adapter.BannerAdapter adapter = 
+                            new com.example.firsttry.activity.hotel.adapter.BannerAdapter(hotels, true);
+                        
+                        adapter.setOnBannerClickListener(position -> {
+                            HotelModel hotel = hotels.get(position);
+                            android.content.Intent intent = new android.content.Intent(getContext(), com.example.firsttry.activity.hotel.HotelDetailActivity.class);
+                            intent.putExtra(com.example.firsttry.activity.hotel.HotelDetailActivity.EXTRA_HOTEL_ID, hotel.getId());
+                            startActivity(intent);
+                        });
+                        vpBanner.setAdapter(adapter);
+                    } else {
+                        // Fallback to placeholder if no featured hotels
+                        setupPlaceholderBanner();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> setupPlaceholderBanner());
+            }
+
+            @Override
+            public void onFailure(java.io.IOException e) {
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> setupPlaceholderBanner());
+            }
         });
-        vpBanner.setAdapter(adapter);
 
         // Start Auto Scroll
         vpBanner.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -213,6 +240,23 @@ public class HotelSearchFragment extends Fragment {
         });
         // Kick off
         bannerHandler.postDelayed(bannerRunnable, 3000);
+    }
+
+    private void setupPlaceholderBanner() {
+        List<Integer> images = java.util.Arrays.asList(
+                R.drawable.splash_image,
+                R.drawable.splash_image,
+                R.drawable.splash_image
+        );
+        com.example.firsttry.activity.hotel.adapter.BannerAdapter adapter = 
+            new com.example.firsttry.activity.hotel.adapter.BannerAdapter(images);
+            
+        // No click listener for placeholders, or show "Coming Soon"
+        adapter.setOnBannerClickListener(position -> 
+            android.widget.Toast.makeText(getContext(), "暂无推荐酒店", android.widget.Toast.LENGTH_SHORT).show()
+        );
+        
+        vpBanner.setAdapter(adapter);
     }
 
     private void setupRoomGuestSelector(View rootView) {
@@ -419,5 +463,24 @@ public class HotelSearchFragment extends Fragment {
 
     private void setupSearch() {
         btnSearch.setOnClickListener(v -> performSearch());
+        
+        // Setup Logout Listener
+        if (tvLogout != null) {
+            tvLogout.setOnClickListener(v -> performLogout());
+        }
+    }
+    
+    private void performLogout() {
+        // 1. Clear SharedPreferences (Auth token, user info)
+        android.content.SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
+        
+        // 2. Navigate to LoginActivity
+        android.content.Intent intent = new android.content.Intent(requireContext(), com.example.firsttry.activity.user.LoginActivity.class);
+        intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        
+        // 3. Show Toast
+        android.widget.Toast.makeText(requireContext(), "已退出登录", android.widget.Toast.LENGTH_SHORT).show();
     }
 }

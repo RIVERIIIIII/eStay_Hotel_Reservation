@@ -16,6 +16,5 @@ public class HttpClient {
         return client;
     }
 
-    // 服务器基础URL - 模拟器专用地址
     public static final String BASE_URL = "http://10.0.2.2:5000/";
 }

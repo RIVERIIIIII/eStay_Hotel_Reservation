@@ -7,8 +7,56 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class TimeUtils {
+
+    public static String getTodayDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    public static String getTomorrowDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        return sdf.format(calendar.getTime());
+    }
+
+    public static String formatDateMMdd(String dateStr) {
+        if (dateStr == null) return "";
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = inputFormat.parse(dateStr);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MM-dd", Locale.getDefault());
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return dateStr;
+        }
+    }
+
+    public static int calculateDaysBetween(String startDateStr, String endDateStr) {
+        if (startDateStr == null || endDateStr == null) return 1;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date startDate = sdf.parse(startDateStr);
+            Date endDate = sdf.parse(endDateStr);
+            long diff = endDate.getTime() - startDate.getTime();
+            return (int) (diff / (1000 * 60 * 60 * 24));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 1;
+        }
+    }
+
+    public static long getCurrentTimeMillis() {
+        return System.currentTimeMillis();
+    }
 
     // 定义两种可能的输入格式
     private static final DateTimeFormatter INPUT_FORMATTER_DASH = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

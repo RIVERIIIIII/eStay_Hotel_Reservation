@@ -87,7 +87,17 @@ public class UserApi {
                 } else {
                     try {
                         JSONObject errorBody = new JSONObject(response.body().string());
-                        String errorMessage = errorBody.getString("message");
+                        String errorMessage;
+                        if (errorBody.has("errors")) {
+                            // 解析 express-validator 返回的数组错误
+                            errorMessage = errorBody.getJSONArray("errors")
+                                    .getJSONObject(0).getString("msg");
+                        } else if (errorBody.has("message")) {
+                            errorMessage = errorBody.getString("message");
+                        } else {
+                            errorMessage = "未知错误";
+                        }
+                        
                         if (callback != null) {
                             callback.onError(errorMessage);
                         }
@@ -238,21 +248,17 @@ public class UserApi {
 
     // 重置密码
     public static void reset_password(String email, String password, String confirmPassword, String otp, UserCallback callback) {
-        // 注意：这里的参数需要根据后端API的要求进行调整
-        // 如果后端需要resetToken，那么需要将其作为参数传入
         OkHttpClient client = HttpClient.getClient();
         String url = HttpClient.BASE_URL + "api/auth/reset-password";
 
         JSONObject requestBody = new JSONObject();
         try {
-            if (currentResetToken != null) {
-                requestBody.put("resetToken", currentResetToken);
-            } else {
-                // 如果没有Token，尝试用otp作为Token (虽然可能不对，但作为fallback)
-                requestBody.put("resetToken", otp);
-            }
-            requestBody.put("password", password);
-            requestBody.put("confirmPassword", confirmPassword);
+            requestBody.put("email", email);
+            requestBody.put("newPassword", password); // 后端接收 newPassword
+            // 优先使用 currentResetToken (从 forgot-password 接口获取)
+            // 如果没有则使用用户输入的 OTP (虽然 OTP 只是验证码，但在此流程中充当 Token 角色)
+            // 注意：后端逻辑是用 OTP (resetToken) 来验证，所以这里传 otp
+            requestBody.put("token", otp); // 后端接收 token
         } catch (JSONException e) {
             if (callback != null) {
                 callback.onError("Request body error");

@@ -74,13 +74,7 @@ io.on('connection', (socket) => {
     console.log(`User ${userId} joined their room`);
   });
 
-  // 发送消息
-  socket.on('sendMessage', (message) => {
-    // 保存消息到数据库的逻辑将在messageController中处理
-    // 这里只负责实时转发消息
-    io.to(message.receiverId).emit('newMessage', message);
-    io.to(message.senderId).emit('newMessage', message);
-  });
+
 
   // 断开连接
   socket.on('disconnect', () => {

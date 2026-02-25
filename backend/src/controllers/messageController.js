@@ -1,5 +1,6 @@
 import { validationResult } from 'express-validator';
 import Message from '../models/Message.js';
+import User from '../models/User.js';
 import { io } from '../server.js';
 
 // 获取用户消息列表
@@ -73,6 +74,23 @@ export const sendMessage = async (req, res) => {
     }
 
     const { receiverId, content } = req.body;
+    
+    // 获取发送者和接收者的用户信息
+    const sender = await User.findById(req.user._id).select('role');
+    const receiver = await User.findById(receiverId).select('role');
+    
+    if (!receiver) {
+      return res.status(404).json({ message: 'Receiver not found' });
+    }
+    
+    // 检查角色是否为普通用户和商户之间的通信
+    const validRoleCombination = 
+      (sender.role === 'user' && receiver.role === 'merchant') || 
+      (sender.role === 'merchant' && receiver.role === 'user');
+    
+    if (!validRoleCombination) {
+      return res.status(403).json({ message: 'Messages can only be sent between users and merchants' });
+    }
 
     // 创建新消息
     const message = new Message({
@@ -139,9 +157,7 @@ export const sendMessage = async (req, res) => {
     const senderResult = io.to(senderIdStr).emit('newMessage', formattedMessage);
     console.log('发送给发送者的结果:', senderResult);
     
-    // 为了确保消息能够被接收，也尝试向所有连接的客户端发送消息
-    const allResult = io.emit('newMessage', formattedMessage);
-    console.log('发送给所有客户端的结果:', allResult);
+
 
     res.status(201).json({
       message: 'Message sent successfully',

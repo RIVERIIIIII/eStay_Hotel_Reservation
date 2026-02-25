@@ -14,14 +14,16 @@ import com.google.android.material.button.MaterialButton;
 
 public class BookingConfirmationActivity extends AppCompatActivity {
 
+    public static final String EXTRA_HOTEL_ID = "hotel_id";
     public static final String EXTRA_HOTEL_NAME = "hotel_name";
-    public static final String EXTRA_CHECK_IN = "check_in";
-    public static final String EXTRA_CHECK_OUT = "check_out";
-    public static final String EXTRA_TOTAL_NIGHTS = "total_nights";
     public static final String EXTRA_ROOM_TYPE = "room_type";
     public static final String EXTRA_ROOM_DESC = "room_desc";
     public static final String EXTRA_PRICE = "price";
+    public static final String EXTRA_CHECK_IN = "check_in";
+    public static final String EXTRA_CHECK_OUT = "check_out";
+    public static final String EXTRA_TOTAL_NIGHTS = "total_nights";
 
+    private String hotelId;
     private String hotelName;
     private String checkIn;
     private String checkOut;
@@ -40,13 +42,14 @@ public class BookingConfirmationActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        Intent intent = getIntent();
+        android.content.Intent intent = getIntent();
+        hotelId = intent.getStringExtra(EXTRA_HOTEL_ID);
         hotelName = intent.getStringExtra(EXTRA_HOTEL_NAME);
         checkIn = intent.getStringExtra(EXTRA_CHECK_IN);
         checkOut = intent.getStringExtra(EXTRA_CHECK_OUT);
-        totalNights = intent.getLongExtra(EXTRA_TOTAL_NIGHTS, 1);
         roomType = intent.getStringExtra(EXTRA_ROOM_TYPE);
         roomDesc = intent.getStringExtra(EXTRA_ROOM_DESC);
+        totalNights = intent.getLongExtra(EXTRA_TOTAL_NIGHTS, 1);
         price = intent.getIntExtra(EXTRA_PRICE, 0);
     }
 

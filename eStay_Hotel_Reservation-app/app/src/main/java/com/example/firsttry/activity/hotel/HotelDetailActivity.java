@@ -36,6 +36,7 @@ public class HotelDetailActivity extends AppCompatActivity {
     public static final String EXTRA_CHECK_IN = "check_in";
     public static final String EXTRA_CHECK_OUT = "check_out";
 
+    private String hotelId;
     private String checkInDate;
     private String checkOutDate;
     private long totalNights = 1;
@@ -67,11 +68,22 @@ public class HotelDetailActivity extends AppCompatActivity {
         makeStatusBarTransparent();
         setContentView(R.layout.activity_hotel_detail);
 
-        initData();
+        hotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
+        checkInDate = getIntent().getStringExtra(EXTRA_CHECK_IN);
+        checkOutDate = getIntent().getStringExtra(EXTRA_CHECK_OUT);
+
+        // Default dates if not passed
+        if (checkInDate == null) {
+            checkInDate = com.example.firsttry.utils.TimeUtils.getTodayDate();
+        }
+        if (checkOutDate == null) {
+            checkOutDate = com.example.firsttry.utils.TimeUtils.getTomorrowDate();
+        }
+
         initViews();
+        initData();
         setupBanner();
-    // private void setupRoomList() {} // Replaced by setupRoomList(List)
-        updateDateUI();
+        updateDateDisplay();
     }
 
     private void makeStatusBarTransparent() {
@@ -83,16 +95,29 @@ public class HotelDetailActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        checkInDate = getIntent().getStringExtra(EXTRA_CHECK_IN);
-        checkOutDate = getIntent().getStringExtra(EXTRA_CHECK_OUT);
+        // Load hotel detail
+        if (hotelId != null) {
+            loadHotelDetail(hotelId);
+        } else {
+            Toast.makeText(this, "无效的酒店ID", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         
-        // Default if null
-        if (checkInDate == null) checkInDate = "2024-05-01";
-        if (checkOutDate == null) checkOutDate = "2024-05-02";
-        
-        // Calculate initial nights (simplified)
-        // In real app, parse dates. For now assume 1 night default or passed via intent?
-        // We will recalculate when date is picked.
+        // Calculate nights and update UI
+        totalNights = com.example.firsttry.utils.TimeUtils.calculateDaysBetween(checkInDate, checkOutDate);
+        updateDateDisplay();
+    }
+
+    private void updateDateDisplay() {
+        // Format: 05-01 至 05-02
+        if (tvDateRange != null) {
+            String start = com.example.firsttry.utils.TimeUtils.formatDateMMdd(checkInDate);
+            String end = com.example.firsttry.utils.TimeUtils.formatDateMMdd(checkOutDate);
+            tvDateRange.setText(String.format("%s 至 %s", start, end));
+        }
+        if (tvNights != null) {
+            tvNights.setText(String.format("共 %d 晚", totalNights));
+        }
     }
 
     private void initViews() {
@@ -139,7 +164,8 @@ public class HotelDetailActivity extends AppCompatActivity {
 
     private void loadHotelDetail(String hotelId) {
         Toast.makeText(this, "正在加载酒店详情...", Toast.LENGTH_SHORT).show();
-        com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, checkInDate, checkOutDate, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {
+         com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, checkInDate, checkOutDate, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {
+         /*com.example.firsttry.remote.Http.HotelApi.getHotelDetail(hotelId, new com.example.firsttry.remote.Http.HotelApi.HotelDetailCallback() {*/
             @Override
             public void onSuccess(HotelModel hotel) {
                 runOnUiThread(() -> {
@@ -271,26 +297,15 @@ public class HotelDetailActivity extends AppCompatActivity {
             this.checkInDate = startDate;
             this.checkOutDate = endDate;
             this.totalNights = nights;
-            updateDateUI();
+            updateDateDisplay();
+            /*refreshRoomPrices();*/
             // 重新加载酒店详情，获取最新的可用房型
             String hotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
             if (hotelId != null) {
-                loadHotelDetail(hotelId);
+            loadHotelDetail(hotelId);
             }
         });
         dialog.show(getSupportFragmentManager(), "CalendarDialog");
-    }
-
-    private void updateDateUI() {
-        // Format: 05-01 至 05-02
-        try {
-            String start = checkInDate.substring(5); // Remove yyyy-
-            String end = checkOutDate.substring(5);
-            tvDateRange.setText(String.format("%s 至 %s", start, end));
-            tvNights.setText(String.format("共 %d 晚", totalNights));
-        } catch (Exception e) {
-            tvDateRange.setText(checkInDate + " 至 " + checkOutDate);
-        }
     }
 
     private void refreshRoomPrices() {
@@ -298,6 +313,15 @@ public class HotelDetailActivity extends AppCompatActivity {
         Toast.makeText(this, "正在更新实时价格...", Toast.LENGTH_SHORT).show();
         // In real app, re-fetch data. Here we just notify adapter to simulate refresh visual
         roomAdapter.notifyDataSetChanged();
+    }
+
+    public String getHotelName() {
+        TextView tvNameCn = findViewById(R.id.tv_hotel_name_cn);
+        return tvNameCn != null ? tvNameCn.getText().toString() : "";
+    }
+    
+    public String getHotelId() {
+        return hotelId;
     }
 
     public String getCheckInDate() {

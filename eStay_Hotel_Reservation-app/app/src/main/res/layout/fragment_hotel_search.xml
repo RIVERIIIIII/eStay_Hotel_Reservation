@@ -16,6 +16,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Logout Button (Top Right Overlay) -->
+    <TextView
+        android:id="@+id/tv_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="登出"
+        android:textSize="14sp"
+        android:textColor="@color/app_primary_brown"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="10dp"
+        android:translationZ="10dp"
+        app:layout_constraintBottom_toTopOf="@id/card_space_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp" />
+
     <!-- Card A: City and Date (Time-Space Card) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/card_space_time"
