@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F3F0"> <!-- 消息列表页背景色 -->
+    android:background="#EFEBE9"> <!-- 消息列表页背景色 -->
 
     <!-- 主内容区 -->
     <LinearLayout
@@ -58,6 +58,6 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:overScrollMode="never"
-            android:background="#F5F3F0"/>
+            android:background="#EFEBE9"/>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

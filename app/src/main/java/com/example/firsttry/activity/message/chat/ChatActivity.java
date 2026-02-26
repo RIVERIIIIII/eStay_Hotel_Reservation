@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,11 +48,16 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
     private String currentUsername;
     private String token;
     private String hotelName; // New field
+    private String conversationPartnerId = "698acb0ecfa6fad12150079f";
 
     private TextView tvUserName;
     private RecyclerView rvMessages;
     private EditText etInput;
     private TextView btnSend;
+    private LinearLayout layoutFaq;
+    private LinearLayout layoutFaqTabs;
+    private LinearLayout layoutFaqQuestions;
+    private int selectedTabIndex = -1;
 
     private UserDbHelper dbHelper;
     private ChatAdapter chatAdapter;
@@ -83,6 +91,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
         initRecyclerView();
         setupActivityResultLaunchers();
         setupHeader();
+        setupFaq();
 
         if (conversationPartnerName != null && !conversationPartnerName.isEmpty()) {
             clearUnreadCountForConversation(conversationPartnerName);
@@ -181,6 +190,9 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
         rvMessages = findViewById(R.id.rv_messages);
         etInput = findViewById(R.id.et_input);
         btnSend = findViewById(R.id.btn_send);
+        layoutFaq = findViewById(R.id.layout_faq);
+        layoutFaqTabs = findViewById(R.id.layout_faq_tabs);
+        layoutFaqQuestions = findViewById(R.id.layout_faq_questions);
         View.OnClickListener toRemarkListener = v -> {
             Intent it = new Intent(ChatActivity.this, EditRemarkActivity.class);
             it.putExtra("CONVERSATION_ID", conversationPartnerName);
@@ -211,6 +223,130 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
                 // 已移除头像展示
             });
         }).start();
+    }
+
+    private void setupFaq() {
+        boolean fromHotel = !TextUtils.isEmpty(hotelName);
+        if (!fromHotel) {
+            layoutFaq.setVisibility(View.GONE);
+            return;
+        }
+        String welcome = "您好，欢迎使用易宿酒店预订平台！\n常见问题可点击上方卡片进行咨询~";
+        String time = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(new java.util.Date());
+        ChatMessage welcomeMsg = new ChatMessage(String.valueOf(System.currentTimeMillis()), conversationPartnerName, conversationPartnerName, currentUsername, welcome, time, false);
+        handleNewMessage(welcomeMsg);
+        layoutFaq.setVisibility(View.VISIBLE);
+        String[] tabs = new String[]{"预订相关", "入住须知", "会员服务", "退款政策", "其他问题"};
+        for (int i = 0; i < tabs.length; i++) {
+            final int index = i;
+            TextView tab = new TextView(this);
+            tab.setText(tabs[i]);
+            tab.setPadding(dp(12), dp(8), dp(12), dp(8));
+            tab.setTextSize(14);
+            tab.setBackgroundColor(0xFFD7CCC8);
+            tab.setTextColor(0xFF5D4037);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.rightMargin = dp(8);
+            tab.setLayoutParams(lp);
+            tab.setOnClickListener(v -> selectFaqTab(index));
+            layoutFaqTabs.addView(tab);
+        }
+        selectFaqTab(0);
+    }
+
+    private void selectFaqTab(int index) {
+        selectedTabIndex = index;
+        int childCount = layoutFaqTabs.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            TextView tab = (TextView) layoutFaqTabs.getChildAt(i);
+            if (i == index) {
+                tab.setBackgroundColor(0xFF5D4037);
+                tab.setTextColor(0xFFFFFFFF);
+            } else {
+                tab.setBackgroundColor(0xFFD7CCC8);
+                tab.setTextColor(0xFF5D4037);
+            }
+        }
+        renderFaqQuestions(getQuestionsForIndex(index));
+    }
+
+    private String[] getQuestionsForIndex(int index) {
+        switch (index) {
+            case 0:
+                return new String[]{
+                        "如何通过易宿平台搜索并预订特定城市的酒店？",
+                        "订单提交后，多久可以收到确认短信或邮件？",
+                        "为什么显示的房价与最终支付时的价格不一致？",
+                        "是否可以代他人预订酒店？入住人姓名填错如何处理？",
+                        "预订时提示“房源紧张”或“满房”该怎么办？",
+                        "如何查看我过往的历史订单记录？"
+                };
+            case 1:
+                return new String[]{
+                        "酒店的标准入住和退房时间分别是几点？",
+                        "办理入住时需要提供哪些有效身份证件？",
+                        "由于行程耽搁，凌晨才到达酒店，预订会被取消吗？",
+                        "未成年人可否在没有监护人陪同下办理入住？",
+                        "酒店是否允许携带宠物入住？是否需要额外收费？",
+                        "入住时是否需要缴纳押金？押金金额通常是多少？"
+                };
+            case 2:
+                return new String[]{
+                        "如何注册成为易宿会员？不同等级的会员有哪些权益？",
+                        "会员积分的有效期是多久？过期后会自动清零吗？",
+                        "在预订过程中，如何使用积分抵扣房费？",
+                        "会员等级是如何晋升的？黑金会员需要满足什么条件？",
+                        "积分除了抵扣房费，还可以兑换礼品或接送机服务吗？",
+                        "忘记会员账号或密码，如何通过绑定手机号找回？"
+                };
+            case 3:
+                return new String[]{
+                        "如何申请修改订单的入住日期或房型？",
+                        "取消预订是否有时间限制？不可取消订单可以退款吗？",
+                        "订单取消成功后，退款通常在几个工作日内原路退回？",
+                        "因不可抗力无法入住，如何申请全额退款？",
+                        "未入住且未提前取消，酒店会扣除首晚房费吗？"
+                };
+            default:
+                return new String[]{
+                        "酒店是否提供免费停车场？是否需要提前预订车位？",
+                        "酒店早餐的供应时间及具体地点在哪里？",
+                        "是否可以申请提前入住或延迟退房？额外费用如何计算？",
+                        "如何在线开具电子发票？纸质发票可以邮寄吗？",
+                        "酒店是否提供免费接送机或接送站服务？"
+                };
+        }
+    }
+
+    private void renderFaqQuestions(String[] qs) {
+        layoutFaqQuestions.removeAllViews();
+        for (String q : qs) {
+            TextView tv = new TextView(this);
+            tv.setText(q);
+            tv.setTextSize(15);
+            tv.setTextColor(0xFF222222);
+            tv.setPadding(dp(8), dp(8), dp(8), dp(8));
+            android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.topMargin = dp(6);
+            tv.setLayoutParams(lp);
+            tv.setBackgroundResource(R.drawable.bg_faq_question_card);
+            tv.setOnClickListener(v -> sendFaqQuestion(q));
+            layoutFaqQuestions.addView(tv);
+        }
+    }
+
+    private void sendFaqQuestion(String content) {
+        String formattedTime = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(new java.util.Date());
+        ChatMessage sentMsg = new ChatMessage(String.valueOf(System.currentTimeMillis()), conversationPartnerName, currentUsername, conversationPartnerName, content, formattedTime, true);
+        handleNewMessage(sentMsg);
+        try {
+            webSocketManager.sendMessage(token, conversationPartnerId, content);
+        } catch (Exception ignored) { }
+    }
+
+    private int dp(int v) {
+        float d = getResources().getDisplayMetrics().density;
+        return (int) (v * d);
     }
 
     private void initRecyclerView() {
