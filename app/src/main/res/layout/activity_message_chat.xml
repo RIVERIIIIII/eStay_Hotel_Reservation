@@ -32,23 +32,7 @@
             android:paddingEnd="12dp"
             android:background="@drawable/bg_header_bubble">
 
-            <FrameLayout
-                android:layout_width="58dp"
-                android:layout_height="58dp"
-                android:background="@drawable/bg_avatar_bubble"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:padding="3dp">
-
-                <!-- 头像图片 -->
-                <ImageView
-                    android:id="@+id/iv_avatar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@mipmap/ic_launcher"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/shape_circle_clip"
-                    android:padding="0dp" />
-            </FrameLayout>
+            <!-- 移除头像展示 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -74,29 +58,7 @@
                         android:ellipsize="end" />
                 </LinearLayout>
 
-                <!-- 下面一行：状态小圆点 + 文本 -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="5dp">
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:background="@drawable/bg_status_dot_online" />
-
-                    <!-- 修改点5：字号微调到 13sp -->
-                    <TextView
-                        android:id="@+id/tv_user_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:text="在线"
-                        android:textColor="#8890A0"
-                        android:textSize="13sp" />
-                </LinearLayout>
+                <!-- 移除“在线”状态展示 -->
             </LinearLayout>
         </LinearLayout>
 

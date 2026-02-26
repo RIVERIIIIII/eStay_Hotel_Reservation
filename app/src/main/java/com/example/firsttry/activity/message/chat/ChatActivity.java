@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.firsttry.Database.User;
 import com.example.firsttry.Database.UserDbHelper;
 import com.example.firsttry.R;
@@ -48,8 +46,6 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
     private String token;
     private String hotelName; // New field
 
-    private ImageView ivAvatar;
-    private TextView tvUserStatus;
     private TextView tvUserName;
     private RecyclerView rvMessages;
     private EditText etInput;
@@ -181,9 +177,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
     }
 
     private void initViews() {
-        ivAvatar = findViewById(R.id.iv_avatar);
         tvUserName = findViewById(R.id.tv_user_name);
-        tvUserStatus = findViewById(R.id.tv_user_status);
         rvMessages = findViewById(R.id.rv_messages);
         etInput = findViewById(R.id.et_input);
         btnSend = findViewById(R.id.btn_send);
@@ -193,7 +187,6 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
             it.putExtra("CURRENT_REMARK", tvUserName.getText().toString());
             editRemarkLauncher.launch(it);
         };
-        ivAvatar.setOnClickListener(toRemarkListener);
         tvUserName.setOnClickListener(toRemarkListener);
     }
 
@@ -203,8 +196,6 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
         // If hotel name is provided, use it directly
         if (!TextUtils.isEmpty(hotelName)) {
             tvUserName.setText("正在咨询：" + hotelName);
-            // Optionally set a default avatar for hotel
-            Glide.with(ChatActivity.this).load(R.drawable.splash_image).circleCrop().into(ivAvatar); // Placeholder
             return;
         }
 
@@ -217,9 +208,7 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
                 } else {
                     tvUserName.setText(conversationPartnerName);
                 }
-                if (partnerUser != null && !TextUtils.isEmpty(partnerUser.getPhoto())) {
-                    Glide.with(ChatActivity.this).load(partnerUser.getPhoto()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).circleCrop().into(ivAvatar);
-                }
+                // 已移除头像展示
             });
         }).start();
     }

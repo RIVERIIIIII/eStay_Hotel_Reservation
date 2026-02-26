@@ -28,7 +28,6 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private Button btnRegister;
     private Button btnForgetPassword;
-    private Button btnSkipLogin; // 临时跳过按钮
     private UserDbHelper dbHelper;
 
     @Override
@@ -49,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin  = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
         btnForgetPassword = findViewById(R.id.forgotPasswordTextView);
-        btnSkipLogin = findViewById(R.id.btn_skip_login);
     }
 
     private void initListeners() {
@@ -123,19 +121,6 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, ForgetPasswordActivity.class));
         });
 
-        if (btnSkipLogin != null) {
-            btnSkipLogin.setOnClickListener(v -> {
-                try {
-                    Class<?> targetClass = Class.forName("com.example.firsttry.MainActivity");
-                    Intent intent = new Intent(LoginActivity.this, targetClass);
-                    startActivity(intent);
-                    // 跳过登录通常不finish，方便返回测试，正式上线可去掉
-                } catch (ClassNotFoundException e) {
-                    Toast.makeText(LoginActivity.this, "目标页面未找到", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Toast.makeText(LoginActivity.this, "跳转异常", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+        // 移除跳过登录入口
     }
 }
