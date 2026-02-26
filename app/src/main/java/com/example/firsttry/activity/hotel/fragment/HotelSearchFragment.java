@@ -435,7 +435,6 @@ public class HotelSearchFragment extends Fragment {
         quickFilters.add("静音房");
         quickFilters.add("影音房");
         quickFilters.add("近地铁");
-        quickFilters.add("4.8分+");
 
         quickFilterAdapter = new QuickFilterAdapter(quickFilters, activeFilters -> {
             // Single Selection Mode: Active filters will only contain the one clicked (or empty if deselected)

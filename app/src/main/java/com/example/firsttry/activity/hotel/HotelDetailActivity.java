@@ -205,6 +205,14 @@ public class HotelDetailActivity extends AppCompatActivity {
         // Update Rating（显示数据库 starRating）
         updateAverageRating(hotel.getStarRating());
         
+        // Update Banner with actual hotel images
+        if (hotel.getImages() != null && !hotel.getImages().isEmpty()) {
+            updateBanner(hotel.getImages());
+        } else if (hotel.getThumbnailUrl() != null && !hotel.getThumbnailUrl().isEmpty()) {
+            // Fallback to thumbnail if images array is empty
+            updateBanner(hotel.getThumbnailUrl());
+        }
+        
         // Update Room List
         setupRoomList(hotel.getRoomTypes());
         
@@ -297,6 +305,24 @@ public class HotelDetailActivity extends AppCompatActivity {
             }
         });
         bannerHandler.postDelayed(bannerRunnable, 3000);
+    }
+    
+    private void updateBanner(List<String> imageUrls) {
+        if (vpBanner == null) return;
+        
+        BannerAdapter bannerAdapter = BannerAdapter.fromImageUrls(imageUrls);
+        vpBanner.setAdapter(bannerAdapter);
+        
+        // Restart auto scroll
+        bannerHandler.removeCallbacks(bannerRunnable);
+        bannerHandler.postDelayed(bannerRunnable, 3000);
+    }
+    
+    private void updateBanner(String thumbnailUrl) {
+        if (vpBanner == null) return;
+        
+        List<String> imageUrls = Arrays.asList(thumbnailUrl);
+        updateBanner(imageUrls);
     }
     
     @Override

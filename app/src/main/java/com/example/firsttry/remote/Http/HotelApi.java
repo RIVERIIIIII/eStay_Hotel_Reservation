@@ -145,8 +145,9 @@ public class HotelApi {
         if (query.getStarRating() > 0) urlBuilder.addQueryParameter("starRating", String.valueOf(query.getStarRating()));
         
         // 设施/标签
-        // 将 quickTags 和 facilities 合并传给 amenities 参数
+        // 将 tags、quickTags 和 facilities 合并传给 amenities 参数
         List<String> allAmenities = new ArrayList<>();
+        if (query.getTags() != null) allAmenities.addAll(query.getTags());
         if (query.getQuickTags() != null) allAmenities.addAll(query.getQuickTags());
         if (query.getFacilities() != null) allAmenities.addAll(query.getFacilities());
         

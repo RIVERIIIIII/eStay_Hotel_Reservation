@@ -7,17 +7,7 @@
     android:paddingVertical="16dp"
     android:background="@color/white">
 
-    <!-- Thumbnail -->
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/iv_room_thumb"
-        android:layout_width="100dp"
-        android:layout_height="120dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/splash_image"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+    <!-- Thumbnail removed -->
 
     <!-- Info Column -->
     <LinearLayout
@@ -26,7 +16,7 @@
         android:orientation="vertical"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintStart_toEndOf="@id/iv_room_thumb"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/layout_price_action"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
