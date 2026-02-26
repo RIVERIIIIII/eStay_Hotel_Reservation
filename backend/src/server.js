@@ -3,6 +3,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import path from 'path';
 import connectDB from './config/database.js';
 import authRoutes from './routes/auth.js';
 import hotelRoutes from './routes/hotels.js';
@@ -25,6 +26,11 @@ const PORT = process.env.PORT || 5000;
 // 中间件
 app.use(cors());
 app.use(express.json());
+
+// 静态文件服务 - 用于提供上传的图片
+// 直接使用项目根目录下的uploads文件夹，与上传配置保持一致
+const uploadDir = path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadDir));
 
 // 路由
 app.use('/api/auth', authRoutes);
@@ -74,7 +80,13 @@ io.on('connection', (socket) => {
     console.log(`User ${userId} joined their room`);
   });
 
-
+  // 发送消息
+  socket.on('sendMessage', (message) => {
+    // 保存消息到数据库的逻辑将在messageController中处理
+    // 这里只负责实时转发消息
+    io.to(message.receiverId).emit('newMessage', message);
+    io.to(message.senderId).emit('newMessage', message);
+  });
 
   // 断开连接
   socket.on('disconnect', () => {

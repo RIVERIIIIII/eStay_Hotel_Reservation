@@ -383,11 +383,19 @@ public class HotelApi {
             // 获取酒店图片
             List<String> images = new ArrayList<>();
             String thumbnailUrl = "https://via.placeholder.com/300x200?text=Hotel+Image";
+            
+            // 优先使用mainImage作为缩略图
+            if (hotelJson.has("mainImage") && !hotelJson.get("mainImage").isJsonNull() && !hotelJson.get("mainImage").getAsString().isEmpty()) {
+                thumbnailUrl = hotelJson.get("mainImage").getAsString();
+            }
+            
+            // 获取所有图片
             if (hotelJson.has("images")) {
                 JsonArray imagesArray = hotelJson.getAsJsonArray("images");
                 for (JsonElement image : imagesArray) {
                     String imageUrl = image.getAsString();
                     images.add(imageUrl);
+                    // 如果没有mainImage，则使用第一张图片作为缩略图
                     if (thumbnailUrl.equals("https://via.placeholder.com/300x200?text=Hotel+Image")) {
                         thumbnailUrl = imageUrl;
                     }

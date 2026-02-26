@@ -17,7 +17,7 @@ public class UserDbHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "user.db";
     // 每次修改表结构，都应增加版本号，以触发 onUpgrade
-    private static final int DB_VERSION = 15; // 升级至 15
+    private static final int DB_VERSION = 16; // 升级至 16
 
     // === 单例模式实现 ===
     private static UserDbHelper instance;

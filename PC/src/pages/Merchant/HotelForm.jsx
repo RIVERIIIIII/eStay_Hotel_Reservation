@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -258,8 +258,6 @@ const HotelForm = () => {
     
     setLoading(true);
     try {
-      const roomTypesStr = formData.roomTypes.map(rt => `${rt.type}:${rt.price}`).join('、');
-      
       // 计算最低价格作为酒店基础价格
       const prices = formData.roomTypes.map(rt => parseFloat(rt.price)).filter(p => !isNaN(p));
       const basePrice = prices.length > 0 ? Math.min(...prices) : 0;
@@ -269,6 +267,20 @@ const HotelForm = () => {
       
       // 转换日期为ISO8601格式
       const openingTimeISO = new Date(formData.opening_time).toISOString();
+      
+      // 过滤出实际的文件对象（如果有）
+      const imageFiles = formData.images.filter(image => image instanceof File);
+      let uploadedImageUrls = [];
+      
+      // 如果有图片文件，先上传图片
+      if (imageFiles.length > 0) {
+        const uploadResult = await hotelService.uploadImages(imageFiles);
+        uploadedImageUrls = uploadResult.imageUrls || [];
+      }
+      
+      // 合并已有的图片URL和新上传的图片URL
+      const existingImageUrls = formData.images.filter(image => typeof image === 'string');
+      const allImageUrls = [...existingImageUrls, ...uploadedImageUrls];
       
       const submitData = {
         name: formData.name,
@@ -283,7 +295,7 @@ const HotelForm = () => {
           type: rt.type,
           price: parseFloat(rt.price) || 0
         })),
-        images: formData.images,
+        images: allImageUrls,
         latitude: parseFloat(formData.latitude) || 0,
         longitude: parseFloat(formData.longitude) || 0,
       };

@@ -8,19 +8,7 @@ export const createHotel = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const {
-    name,
-    name_en,
-    address,
-    starRating,
-    roomTypes,
-    price,
-    openingTime,
-    description,
-    amenities = [],
-    longitude,
-    latitude
-  } = req.body;
+    const { name, name_en, address, starRating, roomTypes, price, openingTime, description, amenities = [], images = [], mainImage = '', longitude, latitude } = req.body;
 
   // 创建酒店对象，包括地理位置信息
   const hotel = new Hotel({
@@ -33,6 +21,8 @@ export const createHotel = async (req, res) => {
     openingTime,
     description,
     amenities,
+    images,
+    mainImage,
     createdBy: req.user._id,
     status: req.user.role === 'admin' ? 'approved' : 'pending'
   });
@@ -134,6 +124,8 @@ export const updateHotel = async (req, res) => {
     openingTime,
     description,
     amenities,
+    images,
+    mainImage,
     longitude,
     latitude
   } = req.body;
@@ -151,6 +143,16 @@ export const updateHotel = async (req, res) => {
     amenities,
     status: 'pending' // 重置为待审核状态
   };
+  
+  // 如果提供了图片信息，则添加到更新对象
+  if (images !== undefined) {
+    updateData.images = images;
+  }
+  
+  // 如果提供了主图信息，则添加到更新对象
+  if (mainImage !== undefined) {
+    updateData.mainImage = mainImage;
+  }
 
   // 如果提供了经纬度信息，则添加到更新对象
   if (longitude !== undefined && latitude !== undefined) {
@@ -198,14 +200,21 @@ export const deleteHotel = async (req, res) => {
 
 export const uploadImages = async (req, res) => {
   try {
-    // 这里简化处理，实际应该使用multer等中间件处理文件上传
-    // 并将图片保存到云存储或本地文件系统
+    // 检查是否有文件上传
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'No images uploaded' });
+    }
     
-    // 模拟返回上传成功的图片URL
-    const imageUrls = [
-      'https://example.com/image1.jpg',
-      'https://example.com/image2.jpg'
-    ];
+    // 获取当前服务器的基本URL
+    // 注意：在Android模拟器中，localhost对应10.0.2.2，所以需要特殊处理
+    const baseUrl = req.protocol + '://' + '10.0.2.2:5000';
+    
+    // 生成完整的图片URL数组
+    const imageUrls = req.files.map(file => {
+      // 使用/uploads前缀和文件名构建完整URL
+      // 使用10.0.2.2确保在Android模拟器中能正确访问
+      return `http://10.0.2.2:5000/uploads/${file.filename}`;
+    });
     
     res.json({
       message: 'Images uploaded successfully',

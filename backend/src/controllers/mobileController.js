@@ -501,6 +501,11 @@ export const getMobileHotels = async (req, res) => {
       hotelObj.rating = hotelObj.averageRating;
       hotelObj.reviewCount = hotelObj.ratingCount;
       
+      // 确保返回mainImage字段
+      if (!hotelObj.mainImage && hotelObj.images && hotelObj.images.length > 0) {
+        hotelObj.mainImage = hotelObj.images[0];
+      }
+      
       return hotelObj;
     });
 
@@ -590,7 +595,16 @@ export const getFeaturedHotels = async (req, res) => {
       }
     }
     
-    res.json({ hotels: featured });
+    // 确保返回mainImage字段
+    const featuredWithMainImage = featured.map(hotel => {
+      const hotelObj = hotel.toObject ? hotel.toObject() : hotel;
+      if (!hotelObj.mainImage && hotelObj.images && hotelObj.images.length > 0) {
+        hotelObj.mainImage = hotelObj.images[0];
+      }
+      return hotelObj;
+    });
+    
+    res.json({ hotels: featuredWithMainImage });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -614,6 +628,11 @@ export const getMobileHotelById = async (req, res) => {
     // 为了向后兼容，添加rating和reviewCount字段映射
     hotelObj.rating = hotelObj.averageRating;
     hotelObj.reviewCount = hotelObj.ratingCount;
+    
+    // 确保返回mainImage字段
+    if (!hotelObj.mainImage && hotelObj.images && hotelObj.images.length > 0) {
+      hotelObj.mainImage = hotelObj.images[0];
+    }
 
     // 如果有城市或经纬度参数，计算距离
     const { city, latitude, longitude, checkInDate, checkOutDate } = req.query;

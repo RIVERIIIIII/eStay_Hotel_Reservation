@@ -91,6 +91,10 @@ const hotelSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  mainImage: {
+    type: String,
+    trim: true
+  },
   rejectReason: {
     type: String,
     trim: true

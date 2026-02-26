@@ -9,6 +9,7 @@ import {
   uploadImages
 } from '../controllers/hotelController.js';
 import { authenticateToken } from '../middleware/auth.js';
+import upload from '../config/upload.js';
 
 const router = express.Router();
 
@@ -51,6 +52,6 @@ router.put('/:id', [
 router.delete('/:id', deleteHotel);
 
 // 上传酒店图片
-router.post('/upload', uploadImages);
+router.post('/upload', upload.array('images'), uploadImages);
 
 export default router;
