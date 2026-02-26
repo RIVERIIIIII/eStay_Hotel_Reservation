@@ -170,19 +170,67 @@ export const getMobileHotels = async (req, res) => {
       query.starRating = parseInt(starRating);
     }
 
+    // 标签名称映射表：将APP端可能使用的标签名称映射到数据库中实际存在的标签名称
+    const tagMapping = {
+      '免费WiFi': ['免费房客WIFI', 'WIFI', '??WiFi'],
+      '免费停车': ['免费停车场', '免费停车'],
+      '健身房': ['健身房', '免费健身房'],
+      '行李寄存': ['行李寄存', '免费行李寄存'],
+      '24小时前台': ['24小时前台'],
+      // 可以根据需要添加更多映射
+    };
+    
     // 按设施筛选（支持amenities和facilities两种参数名）
-    const facilitiesToFilter = amenities || facilities;
+    // 处理多个同名查询参数的情况（?amenities=标签1&amenities=标签2）
+    let facilitiesToFilter;
+    if (req.method === 'GET') {
+      // 对于GET请求，检查req.query.amenities是否为数组
+      if (Array.isArray(req.query.amenities)) {
+        facilitiesToFilter = req.query.amenities;
+      } else if (req.query.amenities) {
+        facilitiesToFilter = [req.query.amenities];
+      } else if (req.query.facilities) {
+        facilitiesToFilter = [req.query.facilities];
+      }
+    } else {
+      // 对于POST请求，使用解构后的参数
+      facilitiesToFilter = amenities || facilities;
+    }
+    
+    // 应用标签名称映射
+    if (facilitiesToFilter) {
+      let mappedFacilities = [];
+      if (Array.isArray(facilitiesToFilter)) {
+        facilitiesToFilter.forEach(facility => {
+          // 如果有映射，则使用映射后的标签；否则使用原标签
+          if (tagMapping[facility]) {
+            mappedFacilities = [...mappedFacilities, ...tagMapping[facility]];
+          } else {
+            mappedFacilities.push(facility);
+          }
+        });
+      } else {
+        // 如果是字符串，也应用映射
+        if (tagMapping[facilitiesToFilter]) {
+          mappedFacilities = tagMapping[facilitiesToFilter];
+        } else {
+          mappedFacilities = [facilitiesToFilter];
+        }
+      }
+      facilitiesToFilter = mappedFacilities;
+    }
+    
     if (facilitiesToFilter) {
       if (Array.isArray(facilitiesToFilter)) {
         // 处理数组格式的设施列表
         if (facilitiesToFilter.length > 0) {
-          query.amenities = { $all: facilitiesToFilter };
+          query.amenities = { $in: facilitiesToFilter };
         }
       } else {
         // 处理字符串格式的设施列表
         const amenitiesArray = facilitiesToFilter.split(',');
         if (amenitiesArray.length > 0 && amenitiesArray[0] !== '') {
-          query.amenities = { $all: amenitiesArray };
+          query.amenities = { $in: amenitiesArray };
         }
       }
     }
@@ -478,8 +526,9 @@ export const getMobileHotels = async (req, res) => {
             
             // 检查时间冲突
             // 冲突条件：如果查询时间段与占用时间段有任何重叠，则视为冲突
-            // 使用包含边界的比较，确保完全重叠的时间段也能被正确检测
-            const hasConflict = !(checkOut <= occupiedCheckIn || checkIn >= occupiedCheckOut);
+            // 正确的逻辑：只有当查询的退房时间小于占用的入住时间，或者查询的入住时间大于占用的退房时间时，才没有冲突
+            // 注意：这里的比较是包含边界的，即如果预订的退房日期是2.26，查询的入住日期是2.26，那么这两个时间范围是冲突的
+            const hasConflict = !(checkOut < occupiedCheckIn || checkIn > occupiedCheckOut);
             
             return !hasConflict;
           });
@@ -529,8 +578,70 @@ export const getFeaturedHotels = async (req, res) => {
     const limit = parseInt(req.query.limit) || 3;
     const { city, latitude, longitude, checkInDate, checkOutDate } = req.query;
     
-    // 查询所有已发布的酒店
-    const hotels = await Hotel.find({ status: 'published' })
+    // 构建查询条件，只查询已发布的酒店
+    let query = { status: 'published' };
+    
+    // 标签名称映射表：将APP端可能使用的标签名称映射到数据库中实际存在的标签名称
+    const tagMapping = {
+      '免费WiFi': ['免费房客WIFI', 'WIFI', '??WiFi'],
+      '免费停车': ['免费停车场', '免费停车'],
+      '健身房': ['健身房', '免费健身房'],
+      '行李寄存': ['行李寄存', '免费行李寄存'],
+      '24小时前台': ['24小时前台'],
+      // 可以根据需要添加更多映射
+    };
+    
+    // 按设施筛选（支持amenities和facilities两种参数名）
+    // 处理多个同名查询参数的情况（?amenities=标签1&amenities=标签2）
+    let facilitiesToFilter;
+    if (Array.isArray(req.query.amenities)) {
+      facilitiesToFilter = req.query.amenities;
+    } else if (req.query.amenities) {
+      facilitiesToFilter = [req.query.amenities];
+    } else if (req.query.facilities) {
+      facilitiesToFilter = [req.query.facilities];
+    }
+    
+    // 应用标签名称映射
+    if (facilitiesToFilter) {
+      let mappedFacilities = [];
+      if (Array.isArray(facilitiesToFilter)) {
+        facilitiesToFilter.forEach(facility => {
+          // 如果有映射，则使用映射后的标签；否则使用原标签
+          if (tagMapping[facility]) {
+            mappedFacilities = [...mappedFacilities, ...tagMapping[facility]];
+          } else {
+            mappedFacilities.push(facility);
+          }
+        });
+      } else {
+        // 如果是字符串，也应用映射
+        if (tagMapping[facilitiesToFilter]) {
+          mappedFacilities = tagMapping[facilitiesToFilter];
+        } else {
+          mappedFacilities = [facilitiesToFilter];
+        }
+      }
+      facilitiesToFilter = mappedFacilities;
+    }
+    
+    if (facilitiesToFilter) {
+      if (Array.isArray(facilitiesToFilter)) {
+        // 处理数组格式的设施列表
+        if (facilitiesToFilter.length > 0) {
+          query.amenities = { $in: facilitiesToFilter };
+        }
+      } else {
+        // 处理字符串格式的设施列表
+        const amenitiesArray = facilitiesToFilter.split(',');
+        if (amenitiesArray.length > 0 && amenitiesArray[0] !== '') {
+          query.amenities = { $in: amenitiesArray };
+        }
+      }
+    }
+    
+    // 查询符合条件的酒店
+    const hotels = await Hotel.find(query)
       .select('-createdBy -status -rejectReason')
       .sort({ createdAt: -1 });
     
@@ -582,8 +693,9 @@ export const getFeaturedHotels = async (req, res) => {
             
             // 检查时间冲突
             // 冲突条件：如果查询时间段与占用时间段有任何重叠，则视为冲突
-            // 使用包含边界的比较，确保完全重叠的时间段也能被正确检测
-            const hasConflict = !(checkOut <= occupiedCheckIn || checkIn >= occupiedCheckOut);
+            // 正确的逻辑：只有当查询的退房时间小于占用的入住时间，或者查询的入住时间大于占用的退房时间时，才没有冲突
+            // 注意：这里的比较是包含边界的，即如果预订的退房日期是2.26，查询的入住日期是2.26，那么这两个时间范围是冲突的
+            const hasConflict = !(checkOut < occupiedCheckIn || checkIn > occupiedCheckOut);
             
             return !hasConflict;
           });
@@ -664,8 +776,9 @@ export const getMobileHotelById = async (req, res) => {
           
           // 检查时间冲突
           // 冲突条件：如果查询时间段与占用时间段有任何重叠，则视为冲突
-          // 使用包含边界的比较，确保完全重叠的时间段也能被正确检测
-          const hasConflict = !(checkOut <= occupiedCheckIn || checkIn >= occupiedCheckOut);
+          // 正确的逻辑：只有当查询的退房时间小于占用的入住时间，或者查询的入住时间大于占用的退房时间时，才没有冲突
+          // 注意：这里的比较是包含边界的，即如果预订的退房日期是2.26，查询的入住日期是2.26，那么这两个时间范围是冲突的
+          const hasConflict = !(checkOut < occupiedCheckIn || checkIn > occupiedCheckOut);
           
           return !hasConflict;
         });

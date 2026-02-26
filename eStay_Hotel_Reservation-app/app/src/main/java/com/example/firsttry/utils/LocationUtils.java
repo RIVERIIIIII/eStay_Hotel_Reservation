@@ -19,6 +19,12 @@ import java.util.Locale;
 
 public class LocationUtils {
 
+    // Mock location settings
+    private static final boolean ENABLE_MOCK_LOCATION = true;
+    private static final double DEFAULT_MOCK_LATITUDE = 39.9042; // 北京纬度
+    private static final double DEFAULT_MOCK_LONGITUDE = 116.4074; // 北京经度
+    private static final String DEFAULT_MOCK_CITY = "北京";
+
     public interface LocationCallback {
         void onLocationSuccess(double latitude, double longitude, String cityName);
         void onLocationFailed(String errorMsg);
@@ -86,8 +92,15 @@ public class LocationUtils {
 
         } else {
             // For better UX in emulator/testing, if location is null, we can return a mock location or error
-            // Here we strictly follow "Fail gracefully"
-            callback.onLocationFailed("无法获取位置，请确保GPS已开启");
+            if (ENABLE_MOCK_LOCATION) {
+                // Use mock location
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    callback.onLocationSuccess(DEFAULT_MOCK_LATITUDE, DEFAULT_MOCK_LONGITUDE, DEFAULT_MOCK_CITY);
+                });
+            } else {
+                // Strictly follow "Fail gracefully"
+                callback.onLocationFailed("无法获取位置，请确保GPS已开启");
+            }
         }
     }
 }

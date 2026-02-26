@@ -106,13 +106,10 @@ public class HotelListActivity extends AppCompatActivity {
     private void setupSubFilter() {
         TextView tvSort = findViewById(R.id.tv_sort);
         tvSort.setOnClickListener(v -> showSortPopup(v));
-
-        TextView tvFilter = findViewById(R.id.tv_filter);
-        tvFilter.setOnClickListener(v -> showFilterPopup(v));
     }
 
     private void showSortPopup(View anchor) {
-        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "评分优先", "距离最近"};
+        final String[] sortOptions = {"推荐排序", "价格从低到高", "价格从高到低", "距离最近"};
         android.widget.ListPopupWindow listPopupWindow = new android.widget.ListPopupWindow(this);
         listPopupWindow.setAnchorView(anchor);
         listPopupWindow.setAdapter(new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sortOptions));
@@ -129,10 +126,7 @@ public class HotelListActivity extends AppCompatActivity {
                 case 2: // Price High -> Low
                     searchQuery.setSortBy("price_desc");
                     break;
-                case 3: // Rating
-                    searchQuery.setSortBy("rating"); // Backend expects "rating" for rating sort
-                    break;
-                case 4: // Distance
+                case 3: // Distance
                     searchQuery.setSortBy("distance_asc"); // Backend expects "distance_asc" for distance sort
                     break;  
                 case 0: // Recommended (Default)
@@ -464,7 +458,6 @@ public class HotelListActivity extends AppCompatActivity {
         quickFilters.add("静音房");
         quickFilters.add("影音房");
         quickFilters.add("近地铁");
-        quickFilters.add("4.8分+");
         
         quickFilterAdapter = new QuickFilterAdapter(quickFilters, activeFilters -> {
             List<String> currentTags = searchQuery.getTags();
@@ -484,9 +477,7 @@ public class HotelListActivity extends AppCompatActivity {
         if (currentTags != null) {
             for (String tag : currentTags) {
                 if (quickFilters.contains(tag)) {
-                    // This method needs to be added to QuickFilterAdapter or logic handled there
-                    // For now, assuming adapter handles internal state update
-                    // quickFilterAdapter.addActiveFilter(tag); 
+                    quickFilterAdapter.addActiveFilter(tag);
                 }
             }
         }
@@ -513,6 +504,17 @@ public class HotelListActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (hotels == null || hotels.isEmpty()) {
                         Toast.makeText(HotelListActivity.this, "暂无符合条件的酒店", Toast.LENGTH_SHORT).show();
+                    }
+                    // 推荐排序兜底：按评分降序排序（优先 averageRating，其次 starRating）
+                    if (searchQuery.getSortBy() == null) {
+                        java.util.Collections.sort(hotels, (a, b) -> {
+                            float ra = a.getAverageRating() > 0 ? a.getAverageRating() : a.getStarRating();
+                            float rb = b.getAverageRating() > 0 ? b.getAverageRating() : b.getStarRating();
+                            int cmp = Float.compare(rb, ra);
+                            if (cmp != 0) return cmp;
+                            // 次级排序：价格从低到高，让评分相同的更划算排前
+                            return Integer.compare(a.getStartPrice(), b.getStartPrice());
+                        });
                     }
                     adapter.updateData(hotels);
                 });

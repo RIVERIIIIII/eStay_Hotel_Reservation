@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_hotel_name"
                     android:layout_marginTop="4dp"
-                    android:text="距市中心 2.5 km"
+                    android:text="据目的地 2.5 km"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
 

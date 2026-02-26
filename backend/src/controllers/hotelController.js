@@ -8,7 +8,7 @@ export const createHotel = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, name_en, address, starRating, roomTypes, price, openingTime, description, amenities = [], images = [], mainImage = '', longitude, latitude } = req.body;
+    const { name, name_en, address, starRating, roomTypes, price, openingTime, description, amenities = [], images = [], mainImage = '', longitude, latitude, phone } = req.body;
 
   // 创建酒店对象，包括地理位置信息
   const hotel = new Hotel({
@@ -23,6 +23,7 @@ export const createHotel = async (req, res) => {
     amenities,
     images,
     mainImage,
+    phone,
     createdBy: req.user._id,
     status: req.user.role === 'admin' ? 'approved' : 'pending'
   });
@@ -101,7 +102,14 @@ export const getHotelById = async (req, res) => {
       return res.status(404).json({ message: 'Hotel not found' });
     }
 
-    res.json({ hotel });
+    // 将location.coordinates转换为前端期望的latitude和longitude格式
+    const hotelData = hotel.toObject();
+    if (hotelData.location && hotelData.location.coordinates) {
+      hotelData.longitude = hotelData.location.coordinates[0];
+      hotelData.latitude = hotelData.location.coordinates[1];
+    }
+
+    res.json({ hotel: hotelData });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -127,7 +135,8 @@ export const updateHotel = async (req, res) => {
     images,
     mainImage,
     longitude,
-    latitude
+    latitude,
+    phone
   } = req.body;
 
   // 构建更新对象
@@ -141,6 +150,7 @@ export const updateHotel = async (req, res) => {
     openingTime,
     description,
     amenities,
+    phone,
     status: 'pending' // 重置为待审核状态
   };
   

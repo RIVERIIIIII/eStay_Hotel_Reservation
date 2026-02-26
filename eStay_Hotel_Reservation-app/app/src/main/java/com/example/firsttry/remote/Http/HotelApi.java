@@ -145,8 +145,9 @@ public class HotelApi {
         if (query.getStarRating() > 0) urlBuilder.addQueryParameter("starRating", String.valueOf(query.getStarRating()));
         
         // 设施/标签
-        // 将 quickTags 和 facilities 合并传给 amenities 参数
+        // 将 tags、quickTags 和 facilities 合并传给 amenities 参数
         List<String> allAmenities = new ArrayList<>();
+        if (query.getTags() != null) allAmenities.addAll(query.getTags());
         if (query.getQuickTags() != null) allAmenities.addAll(query.getQuickTags());
         if (query.getFacilities() != null) allAmenities.addAll(query.getFacilities());
         
@@ -359,8 +360,17 @@ public class HotelApi {
             // 获取酒店地址
             String address = hotelJson.get("address").getAsString();
             
-            // 获取酒店星级
-            int starRating = hotelJson.get("starRating").getAsInt();
+            // 获取酒店评分（使用浮点数，兼容整型/字符串）
+            float starRating = 0f;
+            if (hotelJson.has("starRating") && !hotelJson.get("starRating").isJsonNull()) {
+                try {
+                    starRating = hotelJson.get("starRating").getAsFloat();
+                } catch (Exception e) {
+                    try {
+                        starRating = (float) hotelJson.get("starRating").getAsInt();
+                    } catch (Exception ignored) { }
+                }
+            }
             
             // 获取酒店价格
             int startPrice = hotelJson.get("price").getAsInt();
@@ -415,9 +425,26 @@ public class HotelApi {
                 }
             }
             
+            // 从服务器获取真实评分数据
+            float averageRating = 0.0f;
+            if (hotelJson.has("averageRating") && !hotelJson.get("averageRating").isJsonNull()) {
+                averageRating = hotelJson.get("averageRating").getAsFloat();
+            } else if (hotelJson.has("rating") && !hotelJson.get("rating").isJsonNull()) {
+                // 兼容 rating 字段
+                averageRating = hotelJson.get("rating").getAsFloat();
+            }
+            
+            // 获取酒店联系电话
+            String phone = "";
+            if (hotelJson.has("phone") && !hotelJson.get("phone").isJsonNull()) {
+                phone = hotelJson.get("phone").getAsString();
+            }
+            
             // 创建标签列表
             List<String> tags = new ArrayList<>();
-            tags.add(starRating + "星级酒店");
+            
+            // 使用星级创建标签，格式为"X星级"
+            tags.add(String.format("%.0f星级", starRating));
             if (amenities.size() > 0) {
                 tags.addAll(amenities.subList(0, Math.min(2, amenities.size())));
             }
@@ -434,19 +461,10 @@ public class HotelApi {
             
             // 距离类型：根据查询模式决定
             // 如果是定位模式(isLocationMode=true)，则显示"距离我" -> isCityCenter=false
-            // 如果是城市模式(isLocationMode=false)，则显示"距离市中心" -> isCityCenter=true
+            // 如果是城市模式(isLocationMode=false)，则显示"据目的地" -> isCityCenter=true
             boolean isCityCenter = !isLocationMode;
-
-            // 从服务器获取真实评分数据
-            float averageRating = 0.0f;
-            if (hotelJson.has("averageRating") && !hotelJson.get("averageRating").isJsonNull()) {
-                averageRating = hotelJson.get("averageRating").getAsFloat();
-            } else if (hotelJson.has("rating") && !hotelJson.get("rating").isJsonNull()) {
-                // 兼容 rating 字段
-                averageRating = hotelJson.get("rating").getAsFloat();
-            }
             
-            return new HotelModel(id, name, nameEn, address, starRating, roomTypes, startPrice, openingTime, description, amenities, images, thumbnailUrl, tags, distanceKm, isCityCenter, averageRating);
+            return new HotelModel(id, name, nameEn, address, starRating, roomTypes, startPrice, openingTime, description, amenities, images, thumbnailUrl, tags, distanceKm, isCityCenter, averageRating, phone);
         } catch (Exception e) {
             Log.e(TAG, "解析单个酒店失败: " + e.getMessage());
             return null;

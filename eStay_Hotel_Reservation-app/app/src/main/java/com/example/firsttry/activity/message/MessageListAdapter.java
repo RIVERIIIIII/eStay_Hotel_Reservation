@@ -5,12 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.firsttry.R;
 import com.example.firsttry.utils.TimeUtils;
 import java.util.List;
@@ -44,14 +42,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Log.d("123",String.valueOf(position));
         Message currentMessage = messageList.get(position);
-        // --- 设置头像 ---
-        String avatarUrl = currentMessage.getSenderAvatar();
-        Glide.with(holder.itemView.getContext())
-                .load(avatarUrl)
-                .placeholder(R.drawable.friends) // 你的默认蓝色朋友图标
-                .error(R.drawable.friends)       // 加载失败时也显示这个图标
-                .circleCrop()                      // 应用圆形裁剪
-                .into(holder.avatar);
+        // 已移除头像展示
 
         // --- 设置备注或昵称 ---
         String displayName = currentMessage.getRemark();
@@ -85,7 +76,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        public ImageView avatar;
         public TextView userName;
         public TextView messageSnippet;
         public TextView timestamp;
@@ -94,15 +84,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
         public MessageViewHolder(View view) {
             super(view);
-            avatar = view.findViewById(R.id.iv_avatar);
             userName = view.findViewById(R.id.tv_user_name);
             messageSnippet = view.findViewById(R.id.tv_message_snippet);
             timestamp = view.findViewById(R.id.tv_timestamp);
             unreadCount = view.findViewById(R.id.tv_unread_count);
-            statusDot = view.findViewById(R.id.view_status_dot);
+            statusDot = null;
 
-            if (avatar == null || userName == null || messageSnippet == null ||
-                    timestamp == null || unreadCount == null || statusDot == null) {
+            if (userName == null || messageSnippet == null ||
+                    timestamp == null || unreadCount == null) {
                 throw new IllegalStateException("A required view was not found in the layout R.layout.activity_list_item. Please check all IDs.");
             }
         }

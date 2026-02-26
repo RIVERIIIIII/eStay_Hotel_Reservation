@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    account: '',
+    username: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -42,12 +42,12 @@ const Login = () => {
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="account">用户名/邮箱</label>
+            <label htmlFor="username">用户名</label>
             <input
               type="text"
-              id="account"
-              name="account"
-              value={formData.account}
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               required
             />

@@ -93,13 +93,11 @@ public class RoomTypeAdapter extends RecyclerView.Adapter<RoomTypeAdapter.RoomTy
     }
 
     public static class RoomTypeViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivThumb;
         TextView tvName, tvBedInfo, tvArea, tvPrice;
         View btnBook;
 
         public RoomTypeViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivThumb = itemView.findViewById(R.id.iv_room_thumb);
             tvName = itemView.findViewById(R.id.tv_room_name);
             tvBedInfo = itemView.findViewById(R.id.tv_bed_info);
             tvArea = itemView.findViewById(R.id.tv_room_area);

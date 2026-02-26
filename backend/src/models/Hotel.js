@@ -95,6 +95,12 @@ const hotelSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  // 酒店联系电话
+  phone: {
+    type: String,
+    trim: true,
+    maxlength: 20
+  },
   rejectReason: {
     type: String,
     trim: true

@@ -93,20 +93,6 @@
                 android:gravity="center"
                 android:textColor="@color/text_primary"/>
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="@color/divider_color"/>
-
-            <TextView
-                android:id="@+id/tv_filter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="筛选 ▼"
-                android:gravity="center"
-                android:textColor="@color/text_primary"/>
-
         </LinearLayout>
 
         <!-- Quick Filter Tags -->

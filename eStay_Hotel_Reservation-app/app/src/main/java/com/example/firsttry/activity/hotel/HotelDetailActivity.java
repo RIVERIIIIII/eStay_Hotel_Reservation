@@ -199,11 +199,21 @@ public class HotelDetailActivity extends AppCompatActivity {
         // Update Address & Info
         TextView tvAddress = findViewById(R.id.tv_address);
         TextView tvOpenTime = findViewById(R.id.tv_open_time);
+        TextView tvContactPhone = findViewById(R.id.tv_contact_phone);
         tvAddress.setText("地址：" + hotel.getAddress());
         tvOpenTime.setText("开业时间：" + (hotel.getOpeningTime() != null ? hotel.getOpeningTime().split("T")[0] : "未知"));
+        tvContactPhone.setText("联系电话：" + (hotel.getPhone() != null && !hotel.getPhone().isEmpty() ? hotel.getPhone() : "未知"));
         
-        // Update Rating
-        updateAverageRating(hotel.getAverageRating());
+        // Update Rating（显示数据库 averageRating）
+        updateAverageRating(hotel.getAverageRating() > 0 ? hotel.getAverageRating() : hotel.getStarRating());
+        
+        // Update Banner with actual hotel images
+        if (hotel.getImages() != null && !hotel.getImages().isEmpty()) {
+            updateBanner(hotel.getImages());
+        } else if (hotel.getThumbnailUrl() != null && !hotel.getThumbnailUrl().isEmpty()) {
+            // Fallback to thumbnail if images array is empty
+            updateBanner(hotel.getThumbnailUrl());
+        }
         
         // Update Room List
         setupRoomList(hotel.getRoomTypes());
@@ -241,12 +251,37 @@ public class HotelDetailActivity extends AppCompatActivity {
 
         btnSubmit.setOnClickListener(v -> {
             float rating = ratingBar.getRating();
-            // Simulate backend submission
-            Toast.makeText(this, "评分成功: " + rating + "分", Toast.LENGTH_SHORT).show();
-            // In real app, re-fetch hotel details to get updated average rating
-            // For now, just simulate a slight change
-            updateAverageRating(4.6f); 
-            dialog.dismiss();
+            if (rating <= 0) {
+                Toast.makeText(this, "请先选择评分", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String token = com.example.firsttry.authentication.AuthManager.getInstance().getToken();
+            if (token == null) {
+                Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String currentHotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
+            com.example.firsttry.remote.Http.HotelApi.submitRating(currentHotelId, rating, "", token, new com.example.firsttry.remote.Http.HotelApi.RatingCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(HotelDetailActivity.this, "评分成功", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        // 重新加载详情，刷新 averageRating 展示
+                        if (currentHotelId != null) {
+                            loadHotelDetail(currentHotelId);
+                        }
+                    });
+                }
+                @Override
+                public void onError(String message) {
+                    runOnUiThread(() -> Toast.makeText(HotelDetailActivity.this, "评分失败: " + message, Toast.LENGTH_SHORT).show());
+                }
+                @Override
+                public void onFailure(java.io.IOException e) {
+                    runOnUiThread(() -> Toast.makeText(HotelDetailActivity.this, "网络错误: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            });
         });
 
         dialog.show();
@@ -259,7 +294,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                 R.drawable.splash_image,
                 R.drawable.splash_image
         );
-        BannerAdapter bannerAdapter = new BannerAdapter(images);
+        BannerAdapter bannerAdapter = BannerAdapter.fromLocalImages(images);
         vpBanner.setAdapter(bannerAdapter);
         
         // Start Auto Scroll
@@ -272,6 +307,24 @@ public class HotelDetailActivity extends AppCompatActivity {
             }
         });
         bannerHandler.postDelayed(bannerRunnable, 3000);
+    }
+    
+    private void updateBanner(List<String> imageUrls) {
+        if (vpBanner == null) return;
+        
+        BannerAdapter bannerAdapter = BannerAdapter.fromImageUrls(imageUrls);
+        vpBanner.setAdapter(bannerAdapter);
+        
+        // Restart auto scroll
+        bannerHandler.removeCallbacks(bannerRunnable);
+        bannerHandler.postDelayed(bannerRunnable, 3000);
+    }
+    
+    private void updateBanner(String thumbnailUrl) {
+        if (vpBanner == null) return;
+        
+        List<String> imageUrls = Arrays.asList(thumbnailUrl);
+        updateBanner(imageUrls);
     }
     
     @Override
