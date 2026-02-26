@@ -4,7 +4,9 @@ import {
   getPendingHotels, 
   approveHotel, 
   rejectHotel, 
-  getAllHotels 
+  getAllHotels,
+  publishHotel,
+  offlineHotel
 } from '../controllers/adminController.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
@@ -27,5 +29,11 @@ router.put('/hotels/:id/approve', approveHotel);
 router.put('/hotels/:id/reject', [
   body('reason').notEmpty().withMessage('Rejection reason is required')
 ], rejectHotel);
+
+// 发布酒店
+router.put('/hotels/:id/publish', publishHotel);
+
+// 下线酒店
+router.put('/hotels/:id/offline', offlineHotel);
 
 export default router;

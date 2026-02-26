@@ -41,11 +41,12 @@ export const authAPI = {
   getMe: () => api.get('/auth/me'),
 };
 
-// 酒店管理API
+// 閰掑簵绠＄悊API
 export const hotelAPI = {
   create: (hotelData) => api.post('/hotels', hotelData),
   getAll: (params) => api.get('/hotels', { params }),
   getById: (id) => api.get(`/hotels/${id}`),
+  getFeatured: (params) => api.get('/mobile/hotels/featured', { params }),
   update: (id, hotelData) => api.put(`/hotels/${id}`, hotelData),
   delete: (id) => api.delete(`/hotels/${id}`),
 };

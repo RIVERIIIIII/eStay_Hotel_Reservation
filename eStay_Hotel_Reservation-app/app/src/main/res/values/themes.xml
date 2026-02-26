@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.FirstTry" parent="Theme.Material3.Light.NoActionBar">
+        <!-- 主色 -->
+        <item name="colorPrimary">@color/primary_brown</item>
+        <item name="colorPrimaryVariant">@color/primary_dark_brown</item>
+        <item name="android:colorPrimary">@color/primary_brown</item>
+        
+        <!-- 强调色/辅色 -->
+        <item name="colorSecondary">@color/secondary_linen</item>
+        <item name="colorSecondaryVariant">@color/secondary_linen</item>
+        <item name="colorAccent">@color/secondary_linen</item>
+        <item name="android:colorAccent">@color/secondary_linen</item>
+
+        <!-- 背景色 -->
+        <item name="android:windowBackground">@color/background_oat</item>
+        <item name="android:colorBackground">@color/background_oat</item>
+        
+        <!-- 状态栏 -->
+        <item name="android:statusBarColor">@color/primary_dark_brown</item>
+        <item name="android:windowLightStatusBar">false</item> <!-- 深色背景，白色图标 -->
+
+        <!-- 文字颜色 -->
+        <item name="android:textColorPrimary">@color/text_dark_brown</item>
+        <item name="android:fontFamily">@font/kai</item>
+        <item name="fontFamily">@font/kai</item>
+        
+        <!-- 控件默认着色 -->
+        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlActivated">@color/primary_brown</item>
+        <item name="colorControlHighlight">@color/secondary_linen</item> <!-- Ripple 颜色 -->
+    </style>
+
+    <style name="OtpEditTextStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_otp_box</item>
+        <item name="android:gravity">center</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+    <style name="Widget.App.TextInputLayout.OutlinedBox.Dense" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <!--
+            这个样式继承自 MaterialComponents 的 Dense 样式，
+            它会自动处理好图标和文本之间的间距，并且不会影响触摸事件。
+            你可以根据需要调整 endIconMode、startIconTint 等属性。
+        -->
+    </style>
+</resources>

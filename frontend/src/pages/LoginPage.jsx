@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    username: '',
+    account: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -31,7 +31,7 @@ const LoginPage = () => {
     setError('');
     setLoading(true);
 
-    if (!formData.username || !formData.password) {
+    if (!formData.account || !formData.password) {
       setError('请填写所有必填字段');
       setLoading(false);
       return;
@@ -76,15 +76,15 @@ const LoginPage = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username" className="form-label">用户名</label>
+            <label htmlFor="account" className="form-label">用户名/邮箱</label>
             <input
               type="text"
-              id="username"
-              name="username"
+              id="account"
+              name="account"
               className="form-input"
-              value={formData.username}
+              value={formData.account}
               onChange={handleChange}
-              placeholder="请输入用户名"
+              placeholder="请输入用户名或邮箱"
               disabled={loading}
             />
           </div>

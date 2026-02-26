@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">FirstTry</string>
+    <!-- Hotel Module Strings -->
+    <string name="hotel_search_title">酒店查询</string>
+    <string name="check_in_date">入住日期</string>
+    <string name="check_out_date">离店日期</string>
+    <string name="total_nights">共 %d 晚</string>
+    <string name="filter_hint">价格/星级</string>
+    <string name="search_button">查询酒店</string>
+    <string name="location_permission_denied">需要定位权限才能获取当前位置</string>
+    <string name="city_placeholder">北京</string>
+    <string name="filter_price_range">价格区间 (¥0 - ¥1300)</string>
+    <string name="filter_star_rating">星级选择</string>
+    <string name="star_2_below">二星及以下</string>
+    <string name="star_3">三星</string>
+    <string name="star_4">四星</string>
+    <string name="star_5">五星</string>
+    <string name="action_reset">重置</string>
+    <string name="action_done">完成</string>
+    <string name="calendar_title">选择日期</string>
+    <string name="tag_free_parking">免费停车场</string>
+    <string name="tag_family_friendly">亲子</string>
+    <string name="tag_breakfast">含早餐</string>
+
+</resources>

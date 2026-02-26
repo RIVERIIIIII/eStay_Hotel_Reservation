@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="32dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/bg_faq_bubble">
+
+    <TextView
+        android:id="@+id/tv_faq_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="易宿酒店预订平台 - 常见问题"
+        android:textColor="#5D4037"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="12dp">
+
+        <LinearLayout
+            android:id="@+id/layout_categories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <!-- Categories will be added here -->
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/layout_questions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <!-- Questions will be added here -->
+    </LinearLayout>
+
+</LinearLayout>

@@ -19,6 +19,18 @@ const hotelSchema = new mongoose.Schema({
     trim: true,
     maxlength: 200
   },
+  // 酒店地理位置（经纬度）
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      default: [0, 0]
+    }
+  },
   starRating: {
     type: Number,
     required: true,
@@ -36,7 +48,17 @@ const hotelSchema = new mongoose.Schema({
       required: true,
       min: 0
     },
-    description: String
+    description: String,
+    // 记录当前房间的占用情况
+    occupied: {
+      type: {
+        checkInDate: Date,
+        checkOutDate: Date,
+        bookingId: mongoose.Schema.Types.ObjectId,
+        customerId: mongoose.Schema.Types.ObjectId
+      },
+      default: null
+    }
   }],
   price: {
     type: Number,
@@ -53,7 +75,7 @@ const hotelSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected','published','offline'],
     default: 'pending'
   },
   createdBy: {
@@ -69,13 +91,37 @@ const hotelSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  mainImage: {
+    type: String,
+    trim: true
+  },
+  // 酒店联系电话
+  phone: {
+    type: String,
+    trim: true,
+    maxlength: 20
+  },
   rejectReason: {
     type: String,
     trim: true
+  },
+  averageRating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: null
+  },
+  ratingCount: {
+    type: Number,
+    min: 0,
+    default: 0
   }
 }, {
   timestamps: true
 });
+
+// 创建地理空间索引，支持地理位置查询
+hotelSchema.index({ location: '2dsphere' });
 
 // 添加索引以提高查询性能
 hotelSchema.index({ createdBy: 1, createdAt: -1 });

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="16dp"
+    android:elevation="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="设施服务"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"/>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:singleSelection="false">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_gym"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="健身房"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_pool"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="游泳池"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_wifi"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="免费WiFi"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_free_parking"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="免费停车"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_luggage"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="行李寄存"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_24h_front_desk"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="24小时前台"
+            android:textColor="@color/text_primary"
+            app:chipBackgroundColor="@color/white"
+            app:chipStrokeColor="@color/text_secondary"
+            app:chipStrokeWidth="1dp"/>
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="重置"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="@color/app_primary_brown"
+            app:strokeColor="@color/app_primary_brown"
+            app:cornerRadius="12dp"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="查看"
+            android:backgroundTint="@color/app_primary_brown"
+            android:textColor="@color/white"
+            app:cornerRadius="12dp"/>
+    </LinearLayout>
+
+</LinearLayout>
