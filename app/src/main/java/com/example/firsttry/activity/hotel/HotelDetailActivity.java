@@ -202,8 +202,8 @@ public class HotelDetailActivity extends AppCompatActivity {
         tvAddress.setText("地址：" + hotel.getAddress());
         tvOpenTime.setText("开业时间：" + (hotel.getOpeningTime() != null ? hotel.getOpeningTime().split("T")[0] : "未知"));
         
-        // Update Rating
-        updateAverageRating(hotel.getAverageRating());
+        // Update Rating（显示数据库 starRating）
+        updateAverageRating(hotel.getStarRating());
         
         // Update Room List
         setupRoomList(hotel.getRoomTypes());

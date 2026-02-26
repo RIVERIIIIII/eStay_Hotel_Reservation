@@ -359,8 +359,17 @@ public class HotelApi {
             // 获取酒店地址
             String address = hotelJson.get("address").getAsString();
             
-            // 获取酒店星级
-            int starRating = hotelJson.get("starRating").getAsInt();
+            // 获取酒店评分（使用浮点数，兼容整型/字符串）
+            float starRating = 0f;
+            if (hotelJson.has("starRating") && !hotelJson.get("starRating").isJsonNull()) {
+                try {
+                    starRating = hotelJson.get("starRating").getAsFloat();
+                } catch (Exception e) {
+                    try {
+                        starRating = (float) hotelJson.get("starRating").getAsInt();
+                    } catch (Exception ignored) { }
+                }
+            }
             
             // 获取酒店价格
             int startPrice = hotelJson.get("price").getAsInt();
@@ -417,7 +426,7 @@ public class HotelApi {
             
             // 创建标签列表
             List<String> tags = new ArrayList<>();
-            tags.add(starRating + "星级酒店");
+            tags.add(String.format("%.1f分", starRating));
             if (amenities.size() > 0) {
                 tags.addAll(amenities.subList(0, Math.min(2, amenities.size())));
             }
