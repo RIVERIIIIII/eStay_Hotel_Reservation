@@ -284,7 +284,7 @@ public class HotelDetailActivity extends AppCompatActivity {
                 R.drawable.splash_image,
                 R.drawable.splash_image
         );
-        BannerAdapter bannerAdapter = new BannerAdapter(images);
+        BannerAdapter bannerAdapter = BannerAdapter.fromLocalImages(images);
         vpBanner.setAdapter(bannerAdapter);
         
         // Start Auto Scroll

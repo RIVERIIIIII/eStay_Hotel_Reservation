@@ -154,19 +154,7 @@ public class HotelSearchFragment extends Fragment {
         tvCheckInDate = view.findViewById(R.id.tv_check_in_date);
         tvCheckOutDate = view.findViewById(R.id.tv_check_out_date);
         tvTotalNights = view.findViewById(R.id.tv_total_nights);
-        tvFilterTrigger = view.findViewById(R.id.tv_sort); // Corrected ID: layout_filter contains tv_sort
-        // 修正：确保 tvFilterTrigger 能被找到，如果 XML 中没有 tv_sort，需要使用正确的 ID
-        if (tvFilterTrigger == null) {
-             // 尝试查找 layout_filter 作为触发器
-             View layoutFilter = view.findViewById(R.id.layout_filter);
-             if (layoutFilter instanceof TextView) {
-                 tvFilterTrigger = (TextView) layoutFilter;
-             } else if (layoutFilter != null) {
-                 // 如果 layout_filter 是 LinearLayout，我们需要找到其中的 TextView 或者直接给 layout 设置点击事件
-                 // 这里为了兼容现有代码结构，尽量找到 TextView
-                 tvFilterTrigger = view.findViewById(R.id.tv_sort);
-             }
-        }
+        tvFilterTrigger = view.findViewById(R.id.tv_sort);
         tvRoomGuestInfo = view.findViewById(R.id.tv_room_guest_info);
         etKeyword = view.findViewById(R.id.et_keyword);
         rvQuickTags = view.findViewById(R.id.rv_quick_tags);
@@ -175,26 +163,23 @@ public class HotelSearchFragment extends Fragment {
         vpBanner = view.findViewById(R.id.vp_banner);
 
         // 增加判空保护
-        if (tvCity == null || tvCheckInDate == null || btnSearch == null || vpBanner == null) {
+        if (tvCity == null || tvCheckInDate == null || btnSearch == null) {
             Log.e("HotelSearchFragment", "Critical views not found!");
             Toast.makeText(getContext(), "页面初始化异常", Toast.LENGTH_SHORT).show();
-            // 避免崩溃，但功能可能受限
-            return; 
+            return;
         }
 
         // Set default text
-        if (tvCheckInDate != null) tvCheckInDate.setText(searchQuery.getCheckInDate());
-        if (tvCheckOutDate != null) tvCheckOutDate.setText(searchQuery.getCheckOutDate());
-        if (tvTotalNights != null) tvTotalNights.setText("共 1 晚");
+        tvCheckInDate.setText(searchQuery.getCheckInDate());
+        tvCheckOutDate.setText(searchQuery.getCheckOutDate());
+        tvTotalNights.setText("共 1 晚");
         updateRoomGuestText();
 
         // City click listener
-        if (tvCity != null) {
-            tvCity.setOnClickListener(v -> {
-                Intent intent = new Intent(getContext(), CityPickerActivity.class);
-                cityPickerLauncher.launch(intent);
-            });
-        }
+        tvCity.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), CityPickerActivity.class);
+            cityPickerLauncher.launch(intent);
+        });
     }
 
     private void updateRoomGuestText() {
@@ -215,7 +200,7 @@ public class HotelSearchFragment extends Fragment {
                     // Update Banner with real data
                     if (hotels != null && !hotels.isEmpty()) {
                         com.example.firsttry.activity.hotel.adapter.BannerAdapter adapter = 
-                            new com.example.firsttry.activity.hotel.adapter.BannerAdapter(hotels, true);
+                            com.example.firsttry.activity.hotel.adapter.BannerAdapter.fromHotelData(hotels);
                         
                         adapter.setOnBannerClickListener(position -> {
                             HotelModel hotel = hotels.get(position);
@@ -264,7 +249,7 @@ public class HotelSearchFragment extends Fragment {
                 R.drawable.splash_image
         );
         com.example.firsttry.activity.hotel.adapter.BannerAdapter adapter = 
-            new com.example.firsttry.activity.hotel.adapter.BannerAdapter(images);
+            com.example.firsttry.activity.hotel.adapter.BannerAdapter.fromLocalImages(images);
             
         // No click listener for placeholders, or show "Coming Soon"
         adapter.setOnBannerClickListener(position -> 
@@ -420,26 +405,24 @@ public class HotelSearchFragment extends Fragment {
     }
 
     private void setupFilter(View view) {
-        View filterClickTarget = tvFilterTrigger;
-        if (filterClickTarget == null) {
-            filterClickTarget = view.findViewById(R.id.layout_filter);
-        }
-        
-        if (filterClickTarget != null) {
-            filterClickTarget.setOnClickListener(v -> {
-                FilterBottomSheetDialogFragment bottomSheet = new FilterBottomSheetDialogFragment();
-                bottomSheet.setOnFilterAppliedListener((minPrice, maxPrice, starRating) -> {
-                    searchQuery.setMinPrice(minPrice);
-                    searchQuery.setMaxPrice(maxPrice);
-                    searchQuery.setStarRating(starRating);
-
-                    if (tvFilterTrigger != null) {
-                        String starText = starRating == 0 ? "不限" : starRating + "星";
-                        tvFilterTrigger.setText("价格: ¥" + minPrice + "-" + maxPrice + ", 星级: " + starText);
-                    }
-                });
-                bottomSheet.show(getChildFragmentManager(), "FilterBottomSheet");
+        View layoutFilter = view.findViewById(R.id.layout_filter);
+        View.OnClickListener handler = v -> {
+            FilterBottomSheetDialogFragment bottomSheet = new FilterBottomSheetDialogFragment();
+            bottomSheet.setOnFilterAppliedListener((minPrice, maxPrice, starRating) -> {
+                searchQuery.setMinPrice(minPrice);
+                searchQuery.setMaxPrice(maxPrice);
+                searchQuery.setStarRating(starRating);
+                String starText = starRating == 0 ? "不限" : starRating + "星";
+                if (tvFilterTrigger != null) {
+                    tvFilterTrigger.setText("价格: ¥" + minPrice + "-" + maxPrice + ", 星级: " + starText);
+                }
             });
+            bottomSheet.show(getChildFragmentManager(), "FilterBottomSheet");
+        };
+        if (layoutFilter != null) {
+            layoutFilter.setOnClickListener(handler);
+        } else if (tvFilterTrigger != null) {
+            tvFilterTrigger.setOnClickListener(handler);
         }
     }
 
@@ -498,7 +481,6 @@ public class HotelSearchFragment extends Fragment {
         // 1. Clear SharedPreferences (Auth token, user info)
         android.content.SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
-        com.example.firsttry.authentication.AuthManager.getInstance().clearToken();
         
         // 2. Navigate to LoginActivity
         android.content.Intent intent = new android.content.Intent(requireContext(), com.example.firsttry.activity.user.LoginActivity.class);

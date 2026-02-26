@@ -75,8 +75,8 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
         public void bind(HotelModel hotel) {
             tvName.setText(hotel.getName());
             
-            // Rating (显示数据库 starRating，保留一位小数)
-            float rating = hotel.getStarRating();
+            // Rating (Format to 1 decimal place, high contrast badge)
+            float rating = hotel.getAverageRating();
             tvRatingBadge.setVisibility(View.VISIBLE);
             if (rating <= 0) {
                 tvRatingBadge.setText("暂无评分");

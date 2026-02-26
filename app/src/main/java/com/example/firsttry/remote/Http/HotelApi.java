@@ -359,8 +359,8 @@ public class HotelApi {
             // 获取酒店地址
             String address = hotelJson.get("address").getAsString();
             
-            // 获取酒店星级（数据库可能为浮点）
-            float starRating = hotelJson.get("starRating").getAsFloat();
+            // 获取酒店星级
+            int starRating = hotelJson.get("starRating").getAsInt();
             
             // 获取酒店价格
             int startPrice = hotelJson.get("price").getAsInt();
@@ -383,11 +383,19 @@ public class HotelApi {
             // 获取酒店图片
             List<String> images = new ArrayList<>();
             String thumbnailUrl = "https://via.placeholder.com/300x200?text=Hotel+Image";
+            
+            // 优先使用mainImage作为缩略图
+            if (hotelJson.has("mainImage") && !hotelJson.get("mainImage").isJsonNull() && !hotelJson.get("mainImage").getAsString().isEmpty()) {
+                thumbnailUrl = hotelJson.get("mainImage").getAsString();
+            }
+            
+            // 获取所有图片
             if (hotelJson.has("images")) {
                 JsonArray imagesArray = hotelJson.getAsJsonArray("images");
                 for (JsonElement image : imagesArray) {
                     String imageUrl = image.getAsString();
                     images.add(imageUrl);
+                    // 如果没有mainImage，则使用第一张图片作为缩略图
                     if (thumbnailUrl.equals("https://via.placeholder.com/300x200?text=Hotel+Image")) {
                         thumbnailUrl = imageUrl;
                     }
@@ -409,7 +417,7 @@ public class HotelApi {
             
             // 创建标签列表
             List<String> tags = new ArrayList<>();
-            tags.add(((int)starRating) + "星级酒店");
+            tags.add(starRating + "星级酒店");
             if (amenities.size() > 0) {
                 tags.addAll(amenities.subList(0, Math.min(2, amenities.size())));
             }
