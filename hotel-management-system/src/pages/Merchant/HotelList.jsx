@@ -81,7 +81,16 @@ const HotelList = () => {
       ) : (
         <div className="hotel-list">
           {hotels.length === 0 ? (
-            <p>暂无酒店，点击"添加酒店"创建您的第一个酒店。</p>
+            <div className="empty-hotel-list">
+              <div className="empty-state-content">
+                <div className="empty-state-icon">🏨</div>
+                <h3>暂无酒店</h3>
+                <p>点击"添加酒店"按钮创建您的第一个酒店</p>
+                <Link to="/merchant/hotels/add" className="add-hotel-primary-btn">
+                  添加酒店
+                </Link>
+              </div>
+            </div>
           ) : (
             <table>
               <thead>

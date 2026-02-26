@@ -53,6 +53,7 @@ const HotelForm = () => {
     name: '',
     name_en: '',
     address: '',
+    phone: '',
     star_rating: '',
     opening_time: '',
     description: '',
@@ -113,18 +114,27 @@ const HotelForm = () => {
         openingTime = date.toISOString().split('T')[0];
       }
       
+      // 处理所有可能的字段，确保都有默认值
+      // 处理图片数据，确保格式一致
+      const processedImages = (hotelData.images || []).map((img, index) => ({
+        file: img.file || img,
+        preview: img.preview || img,
+        isMain: index === 0
+      }));
+      
       setFormData({
-        name: hotelData.name,
-        name_en: hotelData.name_en,
-        address: hotelData.address,
-        star_rating: hotelData.star_rating || hotelData.starRating,
-        opening_time: openingTime,
-        description: hotelData.description,
+        name: hotelData.name || '',
+        name_en: hotelData.name_en || hotelData.name || '',
+        address: hotelData.address || '',
+        phone: hotelData.phone || hotelData.contactPhone || hotelData.phoneNumber || '',
+        star_rating: hotelData.star_rating || hotelData.starRating || 1,
+        opening_time: openingTime || '',
+        description: hotelData.description || '',
         facilities: typeof hotelData.facilities === 'string' ? hotelData.facilities.split('、').filter(f => f) : hotelData.facilities || hotelData.amenities || [],
-        images: hotelData.images || [],
+        images: processedImages,
         roomTypes: roomTypes,
-        latitude: hotelData.latitude || '',
-        longitude: hotelData.longitude || '',
+        latitude: hotelData.latitude || hotelData.lat || '',
+        longitude: hotelData.longitude || hotelData.lng || '',
       });
     } catch (err) {
       console.error('Error fetching hotel details:', err);
@@ -143,9 +153,37 @@ const HotelForm = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+    const imagePreviews = files.map(file => ({
+      file,
+      preview: URL.createObjectURL(file),
+      isMain: formData.images.length === 0
+    }));
     setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...files],
+      images: [...prev.images, ...imagePreviews],
+    }));
+  };
+
+  const handleSetMainImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.map((img, i) => ({
+        ...img,
+        isMain: i === index
+      })),
+    }));
+  };
+
+  const handleRemoveImage = (index) => {
+    const updatedImages = [...formData.images];
+    updatedImages.splice(index, 1);
+    // 如果删除的是主图，设置第一张为新的主图
+    if (updatedImages.length > 0 && !updatedImages.some(img => img.isMain)) {
+      updatedImages[0].isMain = true;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      images: updatedImages,
     }));
   };
 
@@ -218,6 +256,10 @@ const HotelForm = () => {
       setError('请填写地址');
       return;
     }
+    if (!formData.phone.trim()) {
+      setError('请填写联系电话');
+      return;
+    }
     if (!formData.star_rating) {
       setError('请选择星级');
       return;
@@ -270,10 +312,14 @@ const HotelForm = () => {
       // 转换日期为ISO8601格式
       const openingTimeISO = new Date(formData.opening_time).toISOString();
       
+      // 处理图片数据，只提交实际的文件或URL
+      const submitImages = formData.images.map(img => img.file || img.preview || img);
+      
       const submitData = {
         name: formData.name,
         name_en: hotelNameEn,
         address: formData.address,
+        phone: formData.phone,
         starRating: parseInt(formData.star_rating) || 1,
         price: basePrice,
         openingTime: openingTimeISO,
@@ -283,7 +329,7 @@ const HotelForm = () => {
           type: rt.type,
           price: parseFloat(rt.price) || 0
         })),
-        images: formData.images,
+        images: submitImages,
         latitude: parseFloat(formData.latitude) || 0,
         longitude: parseFloat(formData.longitude) || 0,
       };
@@ -348,6 +394,18 @@ const HotelForm = () => {
               value={formData.address}
               onChange={handleChange}
               required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="phone">联系电话<span style={{ color: 'red' }}>*</span></label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              placeholder="请输入酒店联系电话"
             />
           </div>
           <div className="form-group">
@@ -575,17 +633,82 @@ const HotelForm = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="images">图片</label>
+            <label>图片</label>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>支持多张图片上传</p>
             <input
               type="file"
               id="images"
               name="images"
               multiple
               onChange={handleImageChange}
+              style={{ marginBottom: '15px' }}
             />
             {formData.images.length > 0 && (
-              <div className="image-preview">
-                <p>已选择 {formData.images.length} 张图片</p>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '10px' }}>已上传图片 ({formData.images.length})</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+                  {formData.images.map((image, index) => (
+                    <div 
+                      key={index} 
+                      style={{
+                        position: 'relative',
+                        width: '150px',
+                        height: '120px',
+                        border: image.isMain ? '2px solid #2196f3' : '1px solid #ddd',
+                        borderRadius: '4px',
+                        padding: '5px',
+                        backgroundColor: '#f9f9f9',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <img 
+                        src={image.preview || image} 
+                        alt={`酒店图片 ${index + 1}`}
+                        style={{
+                          width: '100%',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                          marginBottom: '8px',
+                        }}
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '100%' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleSetMainImage(index)}
+                          style={{
+                            padding: '2px 8px',
+                            backgroundColor: image.isMain ? '#2196f3' : '#f0f0f0',
+                            color: image.isMain ? '#fff' : '#333',
+                            border: '1px solid #ddd',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {image.isMain ? '主图' : '设为主图'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          style={{
+                            padding: '2px 8px',
+                            backgroundColor: '#ff4d4f',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          删除
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

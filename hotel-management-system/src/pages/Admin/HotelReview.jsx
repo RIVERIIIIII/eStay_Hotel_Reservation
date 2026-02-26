@@ -77,7 +77,13 @@ const HotelReview = () => {
       ) : (
         <div className="hotel-review-list">
           {hotels.length === 0 ? (
-            <p>暂无待审核酒店。</p>
+            <div className="empty-hotel-list">
+              <div className="empty-state-content">
+                <div className="empty-state-icon">📋</div>
+                <h3>暂无待审核酒店</h3>
+                <p>当前没有需要审核的酒店申请</p>
+              </div>
+            </div>
           ) : (
             <table>
               <thead>

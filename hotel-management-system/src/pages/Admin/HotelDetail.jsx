@@ -117,6 +117,10 @@ const HotelDetail = () => {
               <span className="detail-value">{hotel.address}</span>
             </div>
             <div className="detail-row">
+              <span className="detail-label">联系电话：</span>
+              <span className="detail-value">{hotel.phone || hotel.contactPhone || hotel.phoneNumber || '未设置'}</span>
+            </div>
+            <div className="detail-row">
               <span className="detail-label">纬度：</span>
               <span className="detail-value">{hotel.latitude || '未设置'}</span>
             </div>
@@ -134,7 +138,18 @@ const HotelDetail = () => {
             </div>
             <div className="detail-row">
               <span className="detail-label">开业时间：</span>
-              <span className="detail-value">{hotel.opening_time || hotel.openingTime}</span>
+              <span className="detail-value">
+                {(() => {
+                  const time = hotel.opening_time || hotel.openingTime;
+                  if (!time) return '未设置';
+                  if (typeof time === 'string' && time.includes('T')) {
+                    // 转换ISO8601格式为YYYY-MM-DD
+                    const date = new Date(time);
+                    return date.toISOString().split('T')[0];
+                  }
+                  return time;
+                })()}
+              </span>
             </div>
             <div className="detail-row">
               <span className="detail-label">房型：</span>
@@ -194,9 +209,9 @@ const HotelDetail = () => {
               </span>
             </div>
           </div>
-          {hotel.images && hotel.images.length > 0 && (
-            <div className="detail-section">
-              <h3>图片</h3>
+          <div className="detail-section">
+            <h3>图片</h3>
+            {hotel.images && Array.isArray(hotel.images) && hotel.images.length > 0 ? (
               <div className="detail-images">
                 {hotel.images.map((image, index) => (
                   <img
@@ -207,8 +222,10 @@ const HotelDetail = () => {
                   />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="detail-value">未上传图片</div>
+            )}
+          </div>
           <div className="hotel-detail-footer">
             <button onClick={() => navigate(-1)} className="back-btn-small">
               返回

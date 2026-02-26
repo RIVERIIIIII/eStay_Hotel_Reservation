@@ -70,7 +70,9 @@ const authService = {
     } catch (error) {
       console.error('Error getting current user:', error);
       if (error.response?.status === 401) {
-        logout();
+        //logout();
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       }
       return null;
     }

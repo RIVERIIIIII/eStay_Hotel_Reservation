@@ -66,7 +66,13 @@ const HotelManagement = () => {
       ) : (
         <div className="hotel-management-list">
           {hotels.length === 0 ? (
-            <p>暂无酒店。</p>
+            <div className="empty-hotel-list">
+              <div className="empty-state-content">
+                <div className="empty-state-icon">🏨</div>
+                <h3>暂无酒店</h3>
+                <p>商户还未创建任何酒店</p>
+              </div>
+            </div>
           ) : (
             <table>
               <thead>
