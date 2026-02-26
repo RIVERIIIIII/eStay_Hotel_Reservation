@@ -8,7 +8,7 @@ public class HotelModel implements Serializable {
     private String name;
     private String nameEn;
     private String address;
-    private int starRating;
+    private float starRating;
     private List<RoomType> roomTypes;
     private int startPrice;
     private String openingTime;
@@ -21,7 +21,7 @@ public class HotelModel implements Serializable {
     private boolean isCityCenter; // If distance is relative to city center
     private float averageRating; // Added for rating display
 
-    public HotelModel(String id, String name, String nameEn, String address, int starRating, List<RoomType> roomTypes, int startPrice, String openingTime, String description, List<String> amenities, List<String> images, String thumbnailUrl, List<String> tags, double distanceKm, boolean isCityCenter, float averageRating) {
+    public HotelModel(String id, String name, String nameEn, String address, float starRating, List<RoomType> roomTypes, int startPrice, String openingTime, String description, List<String> amenities, List<String> images, String thumbnailUrl, List<String> tags, double distanceKm, boolean isCityCenter, float averageRating) {
         this.id = id;
         this.name = name;
         this.nameEn = nameEn;
@@ -60,7 +60,7 @@ public class HotelModel implements Serializable {
     public String getName() { return name; }
     public String getNameEn() { return nameEn; }
     public String getAddress() { return address; }
-    public int getStarRating() { return starRating; }
+    public float getStarRating() { return starRating; }
     public List<RoomType> getRoomTypes() { return roomTypes; }
     public int getStartPrice() { return startPrice; }
     public String getOpeningTime() { return openingTime; }

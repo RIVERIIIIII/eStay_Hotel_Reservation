@@ -17,6 +17,7 @@ import com.example.firsttry.R;
 import com.example.firsttry.activity.utils.VideoActivity;
 import com.example.firsttry.activity.reset_password.ForgetPasswordActivity;
 import com.example.firsttry.remote.Http.UserApi;
+import com.example.firsttry.authentication.AuthManager;
 
 import java.io.IOException;
 
@@ -66,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 // 在 UserApi.login 的回调 onSuccess 内使用这个代码替换原有 runOnUiThread(...) 部分
                 @Override
                 public void onSuccess(String token) {
+                    AuthManager.getInstance().saveToken(token);
                     // 在后台线程做数据库相关阻塞操作
                     new Thread(() -> {
                         User user = dbHelper.searchUserByAccount(inputAccount);

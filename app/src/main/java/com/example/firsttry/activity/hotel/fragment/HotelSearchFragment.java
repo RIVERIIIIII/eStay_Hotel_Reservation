@@ -498,6 +498,7 @@ public class HotelSearchFragment extends Fragment {
         // 1. Clear SharedPreferences (Auth token, user info)
         android.content.SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE);
         prefs.edit().clear().apply();
+        com.example.firsttry.authentication.AuthManager.getInstance().clearToken();
         
         // 2. Navigate to LoginActivity
         android.content.Intent intent = new android.content.Intent(requireContext(), com.example.firsttry.activity.user.LoginActivity.class);

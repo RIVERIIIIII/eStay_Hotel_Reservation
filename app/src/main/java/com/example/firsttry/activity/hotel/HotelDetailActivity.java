@@ -241,12 +241,37 @@ public class HotelDetailActivity extends AppCompatActivity {
 
         btnSubmit.setOnClickListener(v -> {
             float rating = ratingBar.getRating();
-            // Simulate backend submission
-            Toast.makeText(this, "评分成功: " + rating + "分", Toast.LENGTH_SHORT).show();
-            // In real app, re-fetch hotel details to get updated average rating
-            // For now, just simulate a slight change
-            updateAverageRating(4.6f); 
-            dialog.dismiss();
+            if (rating <= 0) {
+                Toast.makeText(this, "请先选择评分", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String token = com.example.firsttry.authentication.AuthManager.getInstance().getToken();
+            if (token == null) {
+                Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String currentHotelId = getIntent().getStringExtra(EXTRA_HOTEL_ID);
+            com.example.firsttry.remote.Http.HotelApi.submitRating(currentHotelId, rating, "", token, new com.example.firsttry.remote.Http.HotelApi.RatingCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(HotelDetailActivity.this, "评分成功", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        // 重新加载详情，刷新 averageRating 展示
+                        if (currentHotelId != null) {
+                            loadHotelDetail(currentHotelId);
+                        }
+                    });
+                }
+                @Override
+                public void onError(String message) {
+                    runOnUiThread(() -> Toast.makeText(HotelDetailActivity.this, "评分失败: " + message, Toast.LENGTH_SHORT).show());
+                }
+                @Override
+                public void onFailure(java.io.IOException e) {
+                    runOnUiThread(() -> Toast.makeText(HotelDetailActivity.this, "网络错误: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            });
         });
 
         dialog.show();

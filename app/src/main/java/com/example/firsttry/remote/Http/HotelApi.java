@@ -359,8 +359,8 @@ public class HotelApi {
             // 获取酒店地址
             String address = hotelJson.get("address").getAsString();
             
-            // 获取酒店星级
-            int starRating = hotelJson.get("starRating").getAsInt();
+            // 获取酒店星级（数据库可能为浮点）
+            float starRating = hotelJson.get("starRating").getAsFloat();
             
             // 获取酒店价格
             int startPrice = hotelJson.get("price").getAsInt();
@@ -409,7 +409,7 @@ public class HotelApi {
             
             // 创建标签列表
             List<String> tags = new ArrayList<>();
-            tags.add(starRating + "星级酒店");
+            tags.add(((int)starRating) + "星级酒店");
             if (amenities.size() > 0) {
                 tags.addAll(amenities.subList(0, Math.min(2, amenities.size())));
             }

@@ -69,13 +69,6 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
         conversationPartnerName = getIntent().getStringExtra("sender_name");
         hotelName = getIntent().getStringExtra("hotel_name"); // Get hotel name
 
-        // 如果有 hotelName，立即更新数据库中的会话备注，确保列表页显示酒店名称
-        if (!TextUtils.isEmpty(hotelName) && !TextUtils.isEmpty(conversationPartnerName)) {
-            new Thread(() -> {
-                dbHelper.updateRemark(conversationPartnerName, hotelName);
-            }).start();
-        }
-
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         currentUsername = prefs.getString("account", "");
 
@@ -84,6 +77,10 @@ public class ChatActivity extends AppCompatActivity implements WebSocketListener
 
         if (!TextUtils.isEmpty(currentUsername)) {
             token = dbHelper.getUserToken(currentUsername);
+        }
+
+        if (!TextUtils.isEmpty(hotelName) && !TextUtils.isEmpty(conversationPartnerName)) {
+            new Thread(() -> dbHelper.updateRemark(conversationPartnerName, hotelName)).start();
         }
 
         initViews();
