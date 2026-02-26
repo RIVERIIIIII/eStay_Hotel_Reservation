@@ -1,332 +1,104 @@
-# 易宿酒店预订平台
+# 易宿酒店预订平台 (eStay) - 全栈管理与预订体系
 
-一个前后端分离的酒店预订平台基础框架，实现商家端的登录、注册、酒店信息管理及图片上传功能。
+> 
+> **项目定位**：连接“商户端管理”与“移动端体验”的智慧出行酒店预订平台。基于 Node.js 驱动，打通从信息录入、审核发布到用户预订、实时沟通的完整业务闭环。 
+> 
+> 
 
-## 技术栈
+---
 
-### 后端
-- Node.js + Express
-- MongoDB
-- JWT 认证
-- bcrypt 密码加密
-- multer 文件上传
+## 🚀 核心价值与闭环展示
 
-### 前端
-- React 18
-- Vite
-- React Router
-- Axios
+*本项目的核心在于 B 端（管理侧）与 C 端（用户侧）的高效协同与数据一致性。*
 
-## 快速开始
+* 
+**B 端闭环**：商户入驻 $\rightarrow$ 信息录入(中/英/图) $\rightarrow$ 管理员审核(原因记录) $\rightarrow$ 发布/下线管理(可恢复)。 
 
-### 环境要求
-- Node.js 16+
-- MongoDB 4.4+
-- npm 或 yarn
 
-### 安装依赖
+* 
+**C 端闭环**：定位/搜索 $\rightarrow$ 日历筛选 $\rightarrow$ 列表渲染优化 $\rightarrow$ 沉浸式详情(低价优先) $\rightarrow$ 实时咨询。 
+
+
+* 
+**数据纽带**：Node.js + Socket 驱动，实现 **“B 端保存，C 端实时更新”** 的动态体验。 
+
+
+
+---
+
+## 🛠 技术版图 (Technical Stack)
+
+| 维度 | 技术选型 | 关键特性 |
+| --- | --- | --- |
+| **移动端 (C 端)** | **原生 Android** | 分层架构、RecyclerView 性能优化、沉浸式 UI、Socket 长连接 |
+| **PC 管理端 (B 端)** | **React + Vite** | 集中式状态管理、RBAC 权限路由、响应式布局 (Ant Design 思路) |
+| **服务端 (Server)** | **Node.js + MongoDB** | RESTful API 契约、会话鉴权中间件、实时消息网关、环境化配置 |
+
+---
+
+## 🌟 评审维度亮点 (Targeted Highlights)
+
+
+### 1. 功能完整度（60分）对照表
+
+| 端别 | 页面/功能 | 权重分数 | 完成度 | 说明 |
+|---|---|---:|---|---|
+| 移动端（C端） | 酒店查询首页 | 5 | ✅ 已完成 | 定位/搜索、快捷标签、日历筛选与查询跳转 |
+| 移动端（C端） | 酒店列表页 | 15 | ✅ 已完成（分页刷新） | 顶部筛选与排序；列表项包含缩略图/评分/距离/起价；点击跳转详情；长列表渲染 |
+| 移动端（C端） | 酒店详情页 | 15 | ✅ 已完成 | 沉浸式折叠头 + 视差 Banner；日期筛选；房型价格默认低→高排序 |
+| PC 管理端（B端） | 登录/注册 | 5 | ✅ 已完成 | 角色注册（商户/管理员），登录态与路由访问控制 |
+| PC 管理端（B端） | 酒店信息录入/编辑/修改 | 10 | ✅ 已完成 | 中英文字段、设施与房型、联系电话、图片上传与主图设置、表单校验 |
+| PC 管理端（B端） | 酒店信息审核/发布/下线列表 | 10 | ✅ 已完成 | 通过/拒绝（原因记录），发布与下线（可恢复），统一空白态与列表管理 |
+
+### 2. 技术复杂度与用户体验（20分）
+- 性能优化：移动端采用高复用列表 + 分页刷新，降低绘制与内存压力（对应“长列表渲染优化”）。  
+- 交互设计：沉浸式详情页吸顶设计；自定义日历组件支持间夜自动计算，提升体验流畅度。  
+- 实时同步：基于 Socket 的消息/事件分发，确保多端数据一致。
+
+### 3. 代码质量与工程化（10分）
+- 规范化：端内分层清晰（表现/业务/服务/资源），统一错误与空态策略。  
+- 复用性：抽象表单校验、通用列表、网络层拦截器等复用组件。 
+
+### 4. 进阶功能介绍表
+
+| 模块 | 功能点 | 价值 | 完成度 |
+|---|---|---|---|
+| 移动端 · 消息列表 | 展示备注/用户名、最新消息摘要、时间与未读角标；本地离线读取 | 强化沟通效率与留存，支持断网可读 | 
+| 移动端 · 消息详情 | 文本双向收发、FAQ 快速问答插入、滚动到底部与时间友好文案 | 提升咨询效率与体验一致性 | 
+| 移动端 · 实时通信 | Socket 长连接推送消息与事件；前后台生命周期管理 | 保证跨端数据实时一致 | 
+| 管理端 · 发布/下线恢复 | 审核通过后可发布；支持下线并可恢复；统一空白态 | 完整运营闭环与风险可控 | 
+| 移动端 · 沉浸式详情 | 折叠头 + 视差 Banner；日期吸顶；房型价格低→高 | 视觉美感与决策效率提升 | 
+| 移动端 · 长列表优化 | 分页刷新、图片缓存与预缩放、骨架/占位渲染 | 减少掉帧、提升滑动流畅度 | 
+---
+
+## 👥 团队分工 (Teamwork)
+
+| 成员 | 核心负责模块 | 技术实现点 |
+| --- | --- | --- |
+| 江星颖 | 移动端客户端（C 端） | 分层架构与持久化、长列表优化与分页刷新、沉浸式详情与自定义日历 |
+| 李艺文 | Node.js 服务端 | 认证与角色、REST API 与数据模型、Socket 实时消息、文件上传与环境化配置 |
+| 陈美漪 | PC 管理端（B 端） | 认证与路由访问控制、审核流与发布/下线、响应式表单与统一空白态 |
+
+---
+
+## 📂 项目结构指南
 
 ```bash
-# 安装后端依赖
-cd backend
-npm install
-
-# 安装前端依赖
-cd ../frontend
-npm install
-```
-
-### 数据库配置
-
-1. 启动 MongoDB 服务
-2. 设置数据库连接（默认：`mongodb://localhost:27017/hotel-booking`）
-
-### 环境变量配置
-
-后端项目根目录创建 `.env` 文件：
-
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/hotel-booking
-JWT_SECRET=your-super-secret-jwt-key-here
-NODE_ENV=development
-```
-
-### 启动应用
-
-```bash
-# 启动后端服务（在 backend 目录）
-npm run dev
-
-# 启动前端服务（在 frontend 目录）
-npm run dev
-```
-
-应用将在以下地址访问：
-- 前端：http://localhost:3000
-- 后端：http://localhost:5000
-
-## 核心功能
-
-### 用户认证
-- 商家注册/登录
-- JWT Token 认证
-- 基于角色的权限控制（商户/管理员）
-
-### 酒店管理
-- 酒店信息添加、编辑、删除
-- 酒店状态管理（待审核/已通过/已拒绝）
-- 房型信息管理
-- 设施服务管理
-- 酒店图片上传（支持多张图片，可设置主图）
-
-### 管理员功能
-- 酒店信息审核（通过/拒绝）
-- 批量管理功能
-- 查看所有酒店信息
-
-### 移动端功能
-- 酒店搜索
-- 酒店列表展示
-- 酒店详情查看
-
-## API 文档
-
-### 认证接口
-
-#### 用户注册
-```
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "username": "merchant1",
-  "password": "password123",
-  "role": "merchant"
-}
-```
-
-#### 用户登录
-```
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "username": "merchant1",
-  "password": "password123"
-}
-```
-
-#### 获取当前用户信息
-```
-GET /api/auth/me
-Authorization: Bearer <token>
-```
-
-### 酒店管理接口
-
-#### 创建酒店
-```
-POST /api/hotels
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "测试酒店",
-  "name_en": "Test Hotel",
-  "address": "测试地址",
-  "starRating": 4,
-  "price": 300,
-  "openingTime": "2024-01-01",
-  "description": "酒店描述",
-  "roomTypes": [
-    {
-      "type": "标准大床房",
-      "price": 300,
-      "description": "房间描述"
-    }
-  ],
-  "amenities": ["免费停车场", "无线网络"],
-  "images": ["http://localhost:5000/uploads/hotel-123456789.jpg"],
-  "mainImage": "http://localhost:5000/uploads/hotel-123456789.jpg"
-}
-```
-
-#### 获取酒店列表
-```
-GET /api/hotels
-Authorization: Bearer <token>
-```
-
-#### 获取单个酒店详情
-```
-GET /api/hotels/:id
-Authorization: Bearer <token>
-```
-
-#### 更新酒店信息
-```
-PUT /api/hotels/:id
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "更新后的酒店名称",
-  "price": 350,
-  "images": ["http://localhost:5000/uploads/hotel-123456789.jpg", "http://localhost:5000/uploads/hotel-987654321.jpg"],
-  "mainImage": "http://localhost:5000/uploads/hotel-987654321.jpg"
-}
-```
-
-#### 删除酒店
-```
-DELETE /api/hotels/:id
-Authorization: Bearer <token>
-```
-
-#### 上传酒店图片
-```
-POST /api/hotels/upload
-Authorization: Bearer <token>
-Content-Type: multipart/form-data
-
-# FormData 字段
-images: [文件1, 文件2, ...]
-```
-
-### 管理员接口
-
-#### 获取待审核酒店列表
-```
-GET /api/admin/hotels/pending
-Authorization: Bearer <token>
-```
-
-#### 获取所有酒店列表
-```
-GET /api/admin/hotels
-Authorization: Bearer <token>
-```
-
-#### 审核通过酒店
-```
-PUT /api/admin/hotels/:id/approve
-Authorization: Bearer <token>
-```
-
-#### 审核拒绝酒店
-```
-PUT /api/admin/hotels/:id/reject
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "reason": "审核不通过原因"
-}
-```
-
-### 移动端接口
-
-#### 酒店搜索
-```
-GET /api/mobile/hotels/search
-```
-
-#### 获取酒店列表
-```
-GET /api/mobile/hotels
-```
-
-#### 获取酒店详情
-```
-GET /api/mobile/hotels/:id
-```
-
-## 项目结构
+.
+├── eStay_Hotel_Reservation-app/      # Android 客户端代码
+├── eStay_Hotel_Reservation-PC/       # React 管理后台代码
+└── eStay_Hotel_Reservation-backend/   # Node.js 服务端代码
 
 ```
-Hotel-Assistant/
-├── backend/           # Node.js 后端
-│   ├── src/
-│   │   ├── config/         # 配置文件
-│   │   │   ├── database.js  # 数据库配置
-│   │   │   └── upload.js    # 文件上传配置
-│   │   ├── controllers/    # 控制器
-│   │   │   ├── adminController.js  # 管理员控制器
-│   │   │   ├── authController.js    # 认证控制器
-│   │   │   ├── hotelController.js   # 酒店控制器
-│   │   │   └── mobileController.js  # 移动端控制器
-│   │   ├── middleware/     # 中间件
-│   │   │   └── auth.js      # 认证中间件
-│   │   ├── models/         # 数据模型
-│   │   │   ├── Booking.js   # 预订模型
-│   │   │   ├── Hotel.js     # 酒店模型
-│   │   │   └── User.js      # 用户模型
-│   │   ├── routes/         # 路由定义
-│   │   │   ├── admin.js     # 管理员路由
-│   │   │   ├── auth.js      # 认证路由
-│   │   │   ├── hotels.js    # 酒店路由
-│   │   │   └── mobile.js    # 移动端路由
-│   │   └── server.js        # 服务器入口
-│   ├── uploads/            # 上传文件存储目录
-│   ├── .env                # 环境变量配置
-│   ├── package-lock.json
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # 组件
-│   │   │   ├── Layout.jsx       # 布局组件
-│   │   │   └── ProtectedRoute.jsx  # 受保护路由组件
-│   │   ├── contexts/       # 上下文状态
-│   │   │   └── AuthContext.jsx  # 认证上下文
-│   │   ├── pages/          # 页面
-│   │   │   ├── mobile/     # 移动端页面
-│   │   │   │   ├── HotelDetailPage.jsx  # 移动端酒店详情
-│   │   │   │   ├── HotelListPage.jsx     # 移动端酒店列表
-│   │   │   │   └── HotelSearchPage.jsx   # 移动端酒店搜索
-│   │   │   ├── AddHotelPage.jsx   # 酒店添加/编辑页面
-│   │   │   ├── HotelListPage.jsx  # 酒店列表页面
-│   │   │   ├── LoginPage.jsx      # 登录页面
-│   │   │   └── RegisterPage.jsx   # 注册页面
-│   │   ├── services/       # API 服务
-│   │   │   └── api.js      # API 配置
-│   │   ├── App.jsx         # 应用入口组件
-│   │   ├── index.css       # 全局样式
-│   │   ├── main.jsx        # 应用入口文件
-│   │   └── mobile.css      # 移动端样式
-│   ├── index.html          # HTML 模板
-│   ├── package-lock.json
-│   ├── package.json
-│   └── vite.config.js      # Vite 配置
-├── database/
-│   └── init.js             # 数据库初始化脚本
-└── test-integration.js     # 集成测试脚本
-```
 
-## 开发指南
+---
 
-### 后端开发
-- 使用 ES6 模块语法
-- 统一的错误处理机制
-- 输入参数验证
-- 数据库操作使用 Mongoose
-- 文件上传使用 multer
+## 📸 预览与演示
 
-### 前端开发
-- 函数式组件 + Hooks
-- 响应式设计
-- 统一的 API 调用入口
-- Token 自动管理
-- 文件上传使用 FormData
+* **线上演示地址**：[https://www.bilibili.com/video/BV1jiAkz6Eri/?buvid=XU1EB681E958DE97DE393D8B70ABB78AA4E87&from_spmid=dt.space-dt.video.0&is_story_h5=false&mid=2R%2FplVtheVsgcZ4d41c0GQ%3D%3D&p=1&plat_id=114&share_from=ugc&share_medium=android&share_plat=android&share_session_id=3129e479-90d7-4059-bd05-85182114ab9a&share_source=WEIXIN&share_tag=s_i&spmid=united.player-video-detail.0.0&timestamp=1772120713&unique_k=UzHOpXM&up_id=161128936]
+* **产物地址**：[https://github.com/RIVERIIIIII/eStay_Hotel_Reservation/]
 
-### 图片上传功能说明
-
-1. **支持的图片格式**：JPEG/JPG、PNG、GIF
-2. **文件大小限制**：单张图片最大 5MB
-3. **上传数量限制**：最多 10 张图片
-4. **主图设置**：支持选择一张图片作为主图
-5. **图片存储**：上传的图片存储在后端的 `uploads` 目录
-
-## 许可证
-
-MIT License
+> 
+> **注**：本项目保持高频 Git 提交习惯，每个提交点均有明确意义。 
+> 
+> 
