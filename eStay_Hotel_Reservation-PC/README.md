@@ -37,8 +37,7 @@
  | 商户会话页面 |
 | <img width="2148" height="1251" alt="32aff4c579f2688865317d83671c6bb6" src="https://github.com/user-attachments/assets/fd581f94-21cb-4080-ad28-02bf9a5b7538" /><img width="2148" height="1254" alt="d5d2a969e045dfde3679769f25d4b671" src="https://github.com/user-attachments/assets/09880e22-a5c9-4889-9e07-3e6656250ba0" /><img width="2148" height="1254" alt="47f3a10dea8f0950dd0bb91280912cde" src="https://github.com/user-attachments/assets/e9eb454c-6015-4c63-92ca-4665bf7a11e8" />
  | 商户添加/编辑酒店页面 |
-| <img width="2148" height="1254" alt="d3f1b64f78c83511885990c7249f52d3" src="https://github.com/user-attachments/assets/5956b589-c39e-4e73-83be-a53712c8d7d8" />
-<img width="2148" height="1254" alt="25d4540197e7bae177f197328731d529" src="https://github.com/user-attachments/assets/77e1691f-3dac-441e-b91c-c76262739d54" />
+| <img width="2148" height="1254" alt="d3f1b64f78c83511885990c7249f52d3" src="https://github.com/user-attachments/assets/5956b589-c39e-4e73-83be-a53712c8d7d8" /><img width="2148" height="1254" alt="25d4540197e7bae177f197328731d529" src="https://github.com/user-attachments/assets/77e1691f-3dac-441e-b91c-c76262739d54" />
 | 管理员审核酒店页面 |
 | <img width="2148" height="1254" alt="6d2115224e02ecc5efde871e9c1d4c1a" src="https://github.com/user-attachments/assets/d2938b19-015e-4e66-8191-7c031385eb6e" />
  | 管理员管理酒店页面 |
