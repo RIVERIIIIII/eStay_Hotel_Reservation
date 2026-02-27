@@ -30,8 +30,7 @@
 | 登录页面 |
 | <img width="2148" height="1254" alt="e345a857499b7c1e7d0d591fb236df89" src="https://github.com/user-attachments/assets/ab7e75c8-3467-4343-8ea7-69d002b269f1" />
  | 注册页面 |
-| <img width="2148" height="1254" alt="8753ad36f6ff83c24b3d2a3e8d0c6767" src="https://github.com/user-attachments/assets/501a7738-a179-4cad-b289-713a607bf5f1" /> 
-<img width="2148" height="1254" alt="54d7c126c0e7274ea1f0db192ca9d97d" src="https://github.com/user-attachments/assets/b0798e71-1964-4ea7-8677-9d8c61dfdb79" />
+| <img width="2148" height="1254" alt="8753ad36f6ff83c24b3d2a3e8d0c6767" src="https://github.com/user-attachments/assets/501a7738-a179-4cad-b289-713a607bf5f1" /><img width="2148" height="1254" alt="54d7c126c0e7274ea1f0db192ca9d97d" src="https://github.com/user-attachments/assets/b0798e71-1964-4ea7-8677-9d8c61dfdb79" />
  | 商户酒店列表页面 |
 | <img width="2148" height="1254" alt="940d464836f74097a9a0416bfde5e9a0" src="https://github.com/user-attachments/assets/d5f8e3a7-b241-469e-865e-e2a2d4c9858b" />
  | 商户会话页面 |
